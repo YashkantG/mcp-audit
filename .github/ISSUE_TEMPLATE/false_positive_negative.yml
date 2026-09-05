@@ -1,0 +1,34 @@
+name: False positive / false negative
+description: A rule fired when it shouldn't have, or missed something it should have caught
+labels: ["bug", "accuracy"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Which kind is this?
+      options:
+        - False positive (flagged something safe)
+        - False negative (missed something unsafe)
+    validations:
+      required: true
+  - type: input
+    id: rule
+    attributes:
+      label: Rule ID (if known)
+      description: e.g. MCP102 — leave blank for a missed detection with no matching rule yet
+    validations:
+      required: false
+  - type: textarea
+    id: snippet
+    attributes:
+      label: The snippet that was (mis)matched or missed
+      render: python
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is the current behavior wrong?
+      description: What makes this snippet safe (for a false positive) or unsafe (for a false negative)?
+    validations:
+      required: true

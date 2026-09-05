@@ -1,0 +1,21 @@
+name: Feature request
+description: A new rule, language support, or CLI/config capability
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's the gap?
+      description: What can't you currently do, or what does the scanner currently miss?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed approach
+      description: >
+        If it's a new rule: what pattern should it catch, and what severity?
+        If it's a new language: which dangerous sinks / description syntax
+        need handling? See CONTRIBUTING.md for the shape existing rules follow.
+    validations:
+      required: false

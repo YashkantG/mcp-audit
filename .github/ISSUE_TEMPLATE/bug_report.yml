@@ -1,0 +1,36 @@
+name: Bug report
+description: Something crashed, or produced output that's plain wrong
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what did you get instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: >
+        The smallest file/snippet that triggers it, and the exact command you ran
+        (e.g. `mcp-sentinel scan ./repro --format json`). If it's a crash, include
+        the full traceback.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: mcp-sentinel version
+      description: Output of `mcp-sentinel --version`
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version
+      description: Output of `python --version`
+    validations:
+      required: false
