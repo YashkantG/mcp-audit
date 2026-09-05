@@ -5,9 +5,13 @@ the large majority of raw findings turned out to be fake credentials in test
 fixtures and deliberately-unsafe example code — not problems in shipped server
 code. Each case below is a real pattern observed in that survey.
 """
+import json
+
+from mcp_audit.checks.manifest_checks import scan_manifest_file
 from mcp_audit.scanner import scan
 
 DANGEROUS = "import subprocess\nsubprocess.run('x', shell=True)\n"
+LONG = "x " * 300  # over the MCP003 description-length threshold
 
 
 def test_test_directories_are_skipped_by_default(tmp_path):
@@ -69,3 +73,46 @@ def test_a_real_looking_secret_is_still_reported(tmp_path):
     src.mkdir()
     (src / "conf.py").write_text('api_key = "8f4b2c9d1e7a3f6b5c0d9e8a7b4f2c1d"\n')
     assert any(f.rule_id == "MCP201" for f in scan(tmp_path))
+
+
+# --- JSON tool-detection precision -------------------------------------------
+# Surveying real repos showed the manifest walker treating any JSON object with
+# a "description" as an MCP tool: npm package manifests, OpenAPI operation
+# summaries, and versioned schema files all matched.
+
+def test_package_json_description_is_not_a_tool(tmp_path):
+    p = tmp_path / "package.json"
+    p.write_text(json.dumps({"name": "some-package", "description": LONG}))
+    assert scan_manifest_file(p) == []
+
+
+def test_openapi_style_descriptions_are_not_tools(tmp_path):
+    p = tmp_path / "openapi.sdk.json"
+    p.write_text(json.dumps({
+        "paths": {"/x": {"get": {"name": "getX", "description": LONG}}}
+    }))
+    assert scan_manifest_file(p) == []
+
+
+def test_bare_name_description_pair_is_not_enough(tmp_path):
+    p = tmp_path / "whatever.json"
+    p.write_text(json.dumps({"name": "thing", "description": LONG}))
+    assert scan_manifest_file(p) == []
+
+
+def test_real_tool_with_input_schema_is_still_detected(tmp_path):
+    p = tmp_path / "whatever.json"
+    p.write_text(json.dumps({
+        "name": "run_thing",
+        "description": LONG,
+        "inputSchema": {"type": "object", "properties": {}},
+    }))
+    assert any(f.rule_id == "MCP003" for f in scan_manifest_file(p))
+
+
+def test_real_tool_nested_under_tools_key_is_still_detected(tmp_path):
+    p = tmp_path / "mcp.json"
+    p.write_text(json.dumps({
+        "tools": [{"name": "run_thing", "description": LONG}]
+    }))
+    assert any(f.rule_id == "MCP003" for f in scan_manifest_file(p))

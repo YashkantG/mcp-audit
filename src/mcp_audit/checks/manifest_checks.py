@@ -121,10 +121,37 @@ def _check_schema(name: str, schema, file: str, line: int | None = None) -> list
 # JSON manifests (mcp.json, captured tools/list responses, ...)
 # ---------------------------------------------------------------------------
 
+# JSON files that carry a `description` field but never describe an MCP tool.
+# Without this, surveying real repositories flagged npm package descriptions,
+# OpenAPI operation summaries, and JSON-schema field docs as tool descriptions.
+_NON_TOOL_MANIFESTS = {
+    "package.json", "package-lock.json", "tsconfig.json", "composer.json",
+    "composer.lock", "angular.json", "nest-cli.json", "openapi.json",
+    "swagger.json", "manifest.json", "renovate.json",
+}
+
+
+def _looks_like_tool(obj: dict, path: str) -> bool:
+    """An MCP tool definition, not merely something with a description.
+
+    Requires a name+description pair, plus corroboration: either an input
+    schema, or the object sitting under a `tools` key. A bare
+    {"name", "description"} object is far too common in ordinary JSON — npm
+    manifests match it, and so does most of an OpenAPI document.
+    """
+    if not isinstance(obj.get("description"), str):
+        return False
+    if not isinstance(obj.get("name"), str):
+        return False
+    has_schema = isinstance(obj.get("inputSchema") or obj.get("input_schema"), dict)
+    under_tools = "tool" in path.lower()
+    return has_schema or under_tools
+
+
 def _iter_tool_like_objects(obj, path=""):
     """Recursively yield (json_path, dict) for objects that look like tool defs."""
     if isinstance(obj, dict):
-        if "description" in obj and isinstance(obj.get("description"), str):
+        if _looks_like_tool(obj, path):
             yield path, obj
         for key, value in obj.items():
             yield from _iter_tool_like_objects(value, f"{path}.{key}" if path else key)
@@ -142,6 +169,8 @@ def check_tool_definition(tool: dict, file: str, json_path: str) -> list[Finding
 
 
 def scan_manifest_file(path: Path) -> list[Finding]:
+    if path.name.lower() in _NON_TOOL_MANIFESTS:
+        return []
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, UnicodeDecodeError, OSError):
