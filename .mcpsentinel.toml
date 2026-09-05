@@ -1,0 +1,19 @@
+# mcp-sentinel's configuration for scanning itself. Yes, it scans itself in CI.
+#
+# Two exclusions, both of them the honest kind:
+#
+#   tests/  - the fixtures and test cases deliberately contain insecure code and
+#             vulnerable-looking string literals. That's the point of them.
+#
+#   research/ - the ecosystem survey harness shells out to git and to the
+#               scanner itself; it is tooling, not an MCP server.
+#
+# Note what is *not* excluded: src/. The scanner's own source stays covered,
+# with the handful of unavoidable self-references suppressed inline instead
+# (see checks/code_checks.py) so the rest of the file keeps being checked.
+
+[ignore]
+paths = [
+    "*/tests/*",
+    "*/research/*",
+]

@@ -10,9 +10,14 @@ from pathlib import Path
 from mcp_sentinel.models import Finding, Severity
 
 # (rule_id, severity, message, compiled pattern, file suffixes it applies to)
+#
+# The human-readable messages below necessarily contain the very constructs
+# they describe, so several of them trip their own rules when mcp-sentinel is
+# pointed at itself. Suppressed inline rather than excluded wholesale, so the
+# rest of this file stays covered.
 _CHECKS = [
     (
-        "MCP101", Severity.HIGH, "Use of eval()/exec() on dynamic input",
+        "MCP101", Severity.HIGH, "Use of eval()/exec() on dynamic input",  # mcp-sentinel: ignore[MCP101]
         re.compile(r"\b(eval|exec)\s*\("), {".py", ".js", ".ts", ".mjs", ".cjs"},
     ),
     (
@@ -25,19 +30,19 @@ _CHECKS = [
         {".py"},
     ),
     (
-        "MCP102", Severity.HIGH, "os.system() call",
+        "MCP102", Severity.HIGH, "os.system() call",  # mcp-sentinel: ignore[MCP102]
         re.compile(r"\bos\.system\s*\("), {".py"},
     ),
     (
-        "MCP102", Severity.HIGH, "child_process exec()/execSync() call",
+        "MCP102", Severity.HIGH, "child_process exec()/execSync() call",  # mcp-sentinel: ignore[MCP101]
         re.compile(r"\b(exec|execSync)\s*\("), {".js", ".ts", ".mjs", ".cjs"},
     ),
     (
-        "MCP103", Severity.HIGH, "pickle.loads() on potentially untrusted data",
+        "MCP103", Severity.HIGH, "pickle.loads() on potentially untrusted data",  # mcp-sentinel: ignore[MCP103]
         re.compile(r"\bpickle\.loads?\s*\("), {".py"},
     ),
     (
-        "MCP103", Severity.MEDIUM, "yaml.load() without a safe loader",
+        "MCP103", Severity.MEDIUM, "yaml.load() without a safe loader",  # mcp-sentinel: ignore[MCP103]
         re.compile(r"\byaml\.load\s*\((?!.*Loader\s*=\s*yaml\.SafeLoader)"), {".py"},
     ),
 ]

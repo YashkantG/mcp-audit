@@ -128,3 +128,65 @@ def _severity_for_rule(findings: list[Finding], rule_id: str) -> Severity:
         if f.rule_id == rule_id:
             return f.severity
     return Severity.MEDIUM
+
+
+# --------------------------------------------------------------------------
+# Badge — a shields.io "endpoint" payload the scanned project commits to its
+# own repo. No hosted service, nothing phones home: shields.io reads the JSON
+# from the user's own raw.githubusercontent URL.
+# --------------------------------------------------------------------------
+
+def grade(findings: list[Finding]) -> str:
+    """Single-letter posture grade. Deliberately blunt — a badge has ~4 characters
+    to communicate something, so the thresholds favour legibility over nuance.
+    """
+    highs = sum(1 for f in findings if f.severity == Severity.HIGH)
+    mediums = sum(1 for f in findings if f.severity == Severity.MEDIUM)
+    if highs:
+        return "F" if highs >= 5 else "D"
+    if mediums:
+        return "C" if mediums >= 5 else "B"
+    return "A"
+
+
+_GRADE_COLOR = {
+    "A": "brightgreen",
+    "B": "green",
+    "C": "yellow",
+    "D": "orange",
+    "F": "red",
+}
+
+
+def render_badge(findings: list[Finding]) -> str:
+    """shields.io endpoint JSON (https://shields.io/badges/endpoint-badge)."""
+    g = grade(findings)
+    high = sum(1 for f in findings if f.severity == Severity.HIGH)
+    med = sum(1 for f in findings if f.severity == Severity.MEDIUM)
+
+    if not findings:
+        message = "A - no findings"
+    else:
+        parts = []
+        if high:
+            parts.append(f"{high} high")
+        if med:
+            parts.append(f"{med} medium")
+        low = len(findings) - high - med
+        if low and not parts:
+            parts.append(f"{low} low")
+        message = f"{g} - " + ", ".join(parts) if parts else g
+
+    return json_module.dumps({
+        "schemaVersion": 1,
+        "label": "mcp security",
+        "message": message,
+        "color": _GRADE_COLOR[g],
+    }, indent=2)
+
+
+def badge_markdown(raw_url: str = "<raw-url-to-your-committed-badge.json>") -> str:
+    return (
+        f"[![MCP security](https://img.shields.io/endpoint?url={raw_url})]"
+        "(https://github.com/YashkantG/mcp-sentinel)"
+    )

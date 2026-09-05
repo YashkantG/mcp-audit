@@ -8,7 +8,7 @@ from rich.console import Console
 
 from mcp_sentinel import __version__
 from mcp_sentinel.models import Severity
-from mcp_sentinel.report import render_json, render_sarif, render_table
+from mcp_sentinel.report import render_badge, render_json, render_sarif, render_table
 from mcp_sentinel.scanner import scan as run_scan
 
 app = typer.Typer(
@@ -40,7 +40,7 @@ def scan_command(
     target: Path = typer.Argument(
         ..., exists=True, help="Path to an MCP server project, a single source file, or a captured tools/manifest JSON file."
     ),
-    fmt: str = typer.Option("table", "--format", "-f", help="Output format: table, json, or sarif."),
+    fmt: str = typer.Option("table", "--format", "-f", help="Output format: table, json, sarif, or badge."),
     fail_on: Severity = typer.Option(
         Severity.HIGH, "--fail-on", help="Exit with a non-zero code if a finding at or above this severity is found."
     ),
@@ -60,6 +60,8 @@ def scan_command(
     elif fmt == "sarif":
         root = target if target.is_dir() else target.parent
         print(render_sarif(findings, root))
+    elif fmt == "badge":
+        print(render_badge(findings))
     else:
         render_table(findings, console)
 
