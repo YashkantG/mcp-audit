@@ -1,0 +1,15 @@
+"""Central registry of rule metadata (id -> human-readable title)."""
+
+RULES = {
+    "MCP001": "Prompt-injection phrasing in tool description",
+    "MCP002": "Hidden/invisible unicode characters in tool description",
+    "MCP003": "Suspiciously long tool description (payload smuggling risk)",
+    "MCP004": "Over-broad capability exposed by tool name/description",
+    "MCP005": "Tool schema accepts arbitrary/unvalidated input",
+    "MCP101": "Dangerous code execution sink",
+    "MCP102": "Shell command built from untrusted input",
+    "MCP103": "Unsafe deserialization",
+    "MCP201": "Hardcoded secret or credential",
+    "MCP301": "Server bound to all network interfaces",
+    "MCP302": "Authentication / trust check disabled",
+}

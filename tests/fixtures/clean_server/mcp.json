@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "good-server": {
+      "command": "node",
+      "args": ["server.js"],
+      "env": {
+        "API_KEY": "${API_KEY}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "get_weather",
+      "description": "Returns the current weather for a given city.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "city": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  ],
+  "host": "127.0.0.1"
+}

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-sentinel"
+version = "0.1.0"
+description = "Security scanner for MCP (Model Context Protocol) servers"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Yash Gautam" }]
+keywords = ["mcp", "model-context-protocol", "security", "static-analysis", "llm", "ai-agents"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Security",
+    "Intended Audience :: Developers",
+]
+dependencies = [
+    "typer>=0.12",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+mcp-sentinel = "mcp_sentinel.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
