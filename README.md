@@ -26,8 +26,11 @@ things that quietly turn a "helpful tool" into an attack surface:
 ## Install
 
 ```bash
-pip install mcp-sentinel
+pip install mcp-sentinel-cli
 ```
+
+(the PyPI distribution is named `mcp-sentinel-cli` since `mcp-sentinel` was
+already taken; the installed command is still `mcp-sentinel`)
 
 Or from source:
 
