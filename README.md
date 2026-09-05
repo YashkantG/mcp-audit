@@ -6,6 +6,8 @@
 
 **A security scanner for MCP (Model Context Protocol) servers.**
 
+![mcp-sentinel demo](docs/demo.gif)
+
 MCP servers are exploding — every agent framework now connects to dozens of
 them. Almost none of them get security-reviewed. `mcp-sentinel` finds the
 things that quietly turn a "helpful tool" into an attack surface:
