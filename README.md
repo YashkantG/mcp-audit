@@ -12,7 +12,9 @@ things that quietly turn a "helpful tool" into an attack surface:
 
 - 🧠 **Prompt-injection-prone tool descriptions** — phrasing designed to hijack
   the calling LLM ("ignore previous instructions", hidden invisible unicode,
-  suspiciously long descriptions that smuggle instructions).
+  suspiciously long descriptions that smuggle instructions). Checked both in
+  static JSON manifests **and** in the tool descriptions most servers actually
+  ship: string literals inside their JS/TS/Python source.
 - 🔓 **Over-broad capabilities** — tools that expose shell/exec/arbitrary file
   access, or accept unvalidated free-form input (`additionalProperties: true`).
 - 💣 **Dangerous code paths** in the server implementation — `eval`,
@@ -70,6 +72,30 @@ Use `--format json` for machine-readable output (great for CI), and
 mcp-sentinel scan ./my-mcp-server --format json
 mcp-sentinel scan ./my-mcp-server --fail-on medium   # fail CI on MEDIUM or higher
 ```
+
+## Scanning real servers
+
+Running `mcp-sentinel` against the [official MCP reference servers](https://github.com/modelcontextprotocol/servers)
+(filesystem, git, fetch, memory, time, sequentialthinking, everything) turns
+up genuine, non-hypothetical signal — nothing catastrophic here (these are
+well-maintained reference implementations), but exactly the kind of thing
+worth a second look before you point an agent at a *less* scrutinized server:
+
+```
+src/filesystem:
+  LOW    MCP003  'read_text_file' description is longer than typical (457 chars)
+  MEDIUM MCP004  'list_directory' exposes a broad capability (matched keyword: 'all files')
+  MEDIUM MCP004  'list_directory_with_sizes' exposes a broad capability (matched keyword: 'all files')
+  LOW    MCP003  'search_files' description is longer than typical (424 chars)
+
+src/sequentialthinking:
+  MEDIUM MCP003  'sequentialthinking' description is unusually long (2781 chars)
+```
+
+None of these are bugs in those servers — a filesystem tool legitimately
+needs to describe listing "all files" — but they're exactly the kind of
+capability/length signal you'd want flagged automatically before granting an
+agent access to a server you didn't write.
 
 ## Rules
 

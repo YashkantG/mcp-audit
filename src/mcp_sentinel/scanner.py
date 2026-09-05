@@ -26,6 +26,7 @@ def scan(target: Path) -> list[Finding]:
 
     for source in source_files:
         findings.extend(code_checks.scan_source_file(source))
+        findings.extend(manifest_checks.scan_source_descriptions(source))
 
     for file in all_files:
         findings.extend(secrets_checks.scan_file_for_secrets(file))
