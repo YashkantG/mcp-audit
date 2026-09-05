@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>mcp-audit — MCP security scanner for Model Context Protocol servers</title>
+<meta name="description" content="Open-source MCP security scanner. Audit an MCP server for prompt injection in tool descriptions, hardcoded secrets, dangerous code execution and unsafe defaults. Runs locally, no account, no network calls. SARIF output and a GitHub Action for CI.">
+<link rel="canonical" href="https://yashkantg.github.io/mcp-audit/">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="mcp-audit — MCP security scanner">
+<meta property="og:description" content="Audit an MCP server before you let an agent near it. Prompt-injection detection, secret scanning, SARIF output. Runs entirely on your machine.">
+<meta property="og:url" content="https://yashkantg.github.io/mcp-audit/">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "mcp-audit",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "description": "A command-line security scanner for MCP (Model Context Protocol) servers. Detects prompt injection in tool descriptions, hardcoded secrets, dangerous code execution paths and unsafe defaults.",
+  "url": "https://github.com/YashkantG/mcp-audit",
+  "downloadUrl": "https://pypi.org/project/mcp-audit/",
+  "license": "https://opensource.org/licenses/MIT",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1f2328; --muted: #59636e;
+    --line: #d1d9e0; --accent: #0969da; --code-bg: #f6f8fa;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117; --fg: #e6edf3; --muted: #9198a1;
+      --line: #3d444d; --accent: #4493f8; --code-bg: #161b22;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 3rem 1.25rem 5rem; }
+  h1 { font-size: 2.35rem; margin: 0 0 .4rem; letter-spacing: -.02em; }
+  .tagline { font-size: 1.2rem; color: var(--muted); margin: 0 0 1.5rem; }
+  h2 { font-size: 1.3rem; margin: 2.5rem 0 .75rem; padding-bottom: .3rem; border-bottom: 1px solid var(--line); }
+  h3 { font-size: 1.02rem; margin: 1.5rem 0 .4rem; }
+  a { color: var(--accent); }
+  code, pre { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: .875rem; }
+  pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px; padding: .85rem 1rem; overflow-x: auto; }
+  code { background: var(--code-bg); padding: .12em .35em; border-radius: 4px; }
+  pre code { background: none; padding: 0; }
+  img { max-width: 100%; border-radius: 6px; border: 1px solid var(--line); }
+  .badges { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.5rem; }
+  .badges img { border: 0; }
+  .cta { display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+         padding: .55rem 1.1rem; border-radius: 6px; font-weight: 600; margin: .3rem .4rem .3rem 0; }
+  .cta.secondary { background: transparent; color: var(--accent); border: 1px solid var(--line); }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .92rem; }
+  th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 600; }
+  .muted { color: var(--muted); }
+  footer { margin-top: 3.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>mcp-audit</h1>
+  <p class="tagline">An MCP security scanner. Audit an MCP server before you let an agent near it.</p>
+
+  <div class="badges">
+    <a href="https://github.com/YashkantG/mcp-audit/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/YashkantG/mcp-audit/actions/workflows/ci.yml/badge.svg"></a>
+    <img alt="MCP security grade" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/YashkantG/mcp-audit/main/.github/badges/self-scan.json">
+    <a href="https://pypi.org/project/mcp-audit/"><img alt="PyPI" src="https://img.shields.io/pypi/v/mcp-audit"></a>
+    <img alt="MIT licence" src="https://img.shields.io/badge/License-MIT-yellow.svg">
+  </div>
+
+  <p>
+    <a class="cta" href="https://github.com/YashkantG/mcp-audit">View on GitHub</a>
+    <a class="cta secondary" href="https://pypi.org/project/mcp-audit/">Install from PyPI</a>
+  </p>
+
+  <p>
+    <code>mcp-audit</code> is a command-line security scanner for
+    <strong>MCP (Model Context Protocol) servers</strong>. It scans a server for
+    prompt injection in tool descriptions, hardcoded secrets, dangerous code
+    execution paths, and unsafe defaults — locally, with no account and
+    <strong>no network calls</strong>.
+  </p>
+
+  <img src="demo.gif" alt="mcp-audit scanning an MCP server and printing a table of security findings">
+
+  <h2>Why MCP servers need their own scanner</h2>
+  <p>
+    Connecting an agent to an MCP server hands that server two things at once:
+    code execution on your machine, and a direct line to the model's context.
+    The second is what makes MCP different from an ordinary dependency.
+  </p>
+  <p>
+    A tool's <code>description</code> field is not documentation for humans — it
+    is fed to the LLM as instruction. A server author, or whoever compromised
+    one, can write a description that tells your agent to do something you never
+    asked for, and a code review that only reads the implementation will not see
+    it. There are now
+    <a href="https://mcp.so">20,000+ MCP servers</a> in public directories.
+  </p>
+
+  <h2>Install and scan</h2>
+<pre><code>pip install mcp-audit
+
+git clone https://github.com/some-org/some-mcp-server
+mcp-audit scan ./some-mcp-server</code></pre>
+
+  <h2>What it detects</h2>
+  <table>
+    <tr><th>Rule</th><th>Check</th></tr>
+    <tr><td>MCP001</td><td>Prompt injection / tool poisoning in a tool description</td></tr>
+    <tr><td>MCP002</td><td>Hidden or invisible unicode in a description</td></tr>
+    <tr><td>MCP003</td><td>Suspiciously long description (payload smuggling)</td></tr>
+    <tr><td>MCP004</td><td>Over-broad capability advertised by a tool</td></tr>
+    <tr><td>MCP005</td><td>Tool schema accepting arbitrary unvalidated input</td></tr>
+    <tr><td>MCP101</td><td>Dangerous code execution sink (<code>eval</code>, <code>exec</code>, <code>new Function</code>)</td></tr>
+    <tr><td>MCP102</td><td>Shell command built from untrusted input</td></tr>
+    <tr><td>MCP103</td><td>Unsafe deserialisation (<code>pickle.loads</code>, unsafe <code>yaml.load</code>)</td></tr>
+    <tr><td>MCP201</td><td>Hardcoded secret or credential</td></tr>
+    <tr><td>MCP301</td><td>Server bound to all network interfaces</td></tr>
+    <tr><td>MCP302</td><td>Authentication or trust check disabled</td></tr>
+  </table>
+  <p class="muted">Plus any custom rules you define in <code>.mcpaudit.toml</code>.</p>
+
+  <h2>Use it in CI</h2>
+  <h3>GitHub Action</h3>
+<pre><code>- uses: YashkantG/mcp-audit@main
+  with:
+    path: ./my-mcp-server
+    fail-on: high</code></pre>
+
+  <h3>SARIF into GitHub Code Scanning</h3>
+<pre><code>- uses: YashkantG/mcp-audit@main
+  with:
+    path: ./my-mcp-server
+    format: sarif
+    upload-sarif: "true"</code></pre>
+
+  <h3>pre-commit</h3>
+<pre><code>repos:
+  - repo: https://github.com/YashkantG/mcp-audit
+    rev: v0.3.0
+    hooks:
+      - id: mcp-audit</code></pre>
+
+  <h2>Runs entirely on your machine</h2>
+  <p>
+    <code>mcp-audit</code> makes zero network calls. It does not phone home, does
+    not upload your code, and has no telemetry. Runtime dependencies are
+    <code>typer</code>, <code>rich</code>, and <code>tomli</code> on Python&nbsp;&lt;&nbsp;3.11.
+    Releases publish through
+    <a href="https://docs.pypi.org/trusted-publishers/">PyPI Trusted Publishing</a>,
+    so each one traces back to the GitHub Actions run that built it.
+  </p>
+  <p>
+    If a security team needs to approve it: read the source, then run it with no
+    network access at all. It does not need any.
+  </p>
+
+  <h2>Contributing</h2>
+  <p>
+    Issues and pull requests welcome — especially new rules, more language
+    coverage, and real servers that break it. False positives are treated as
+    real bugs. See
+    <a href="https://github.com/YashkantG/mcp-audit/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+    or pick up a
+    <a href="https://github.com/YashkantG/mcp-audit/labels/good%20first%20issue">good first issue</a>.
+  </p>
+
+  <footer>
+    MIT licensed ·
+    <a href="https://github.com/YashkantG/mcp-audit">GitHub</a> ·
+    <a href="https://pypi.org/project/mcp-audit/">PyPI</a> ·
+    <a href="https://github.com/YashkantG/mcp-audit/blob/main/SECURITY.md">Security policy</a>
+  </footer>
+
+</div>
+</body>
+</html>

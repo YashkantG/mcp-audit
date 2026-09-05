@@ -116,3 +116,45 @@ def test_real_tool_nested_under_tools_key_is_still_detected(tmp_path):
         "tools": [{"name": "run_thing", "description": LONG}]
     }))
     assert any(f.rule_id == "MCP003" for f in scan_manifest_file(p))
+
+
+# --- JS exec() precision ------------------------------------------------------
+# `\b(eval|exec)\(` also matches the ordinary JavaScript RegExp API. Across 141
+# surveyed repos, 77% of MCP101/MCP102 hits were `pattern.exec(line)`.
+
+def _js(tmp_path, code):
+    src = tmp_path / "src"
+    src.mkdir(exist_ok=True)
+    (src / "server.js").write_text(code)
+    return scan(tmp_path)
+
+
+def test_regex_exec_is_not_code_execution(tmp_path):
+    findings = _js(tmp_path, "const m = /^(a+)$/.exec(line);\n"
+                             "while ((match = pattern.exec(line)) !== null) {}\n")
+    assert findings == []
+
+
+def test_destructured_child_process_exec_is_flagged(tmp_path):
+    findings = _js(tmp_path, "const { exec } = require('child_process');\nexec(cmd);\n")
+    assert any(f.rule_id in ("MCP101", "MCP102") for f in findings)
+
+
+def test_child_process_member_exec_is_flagged(tmp_path):
+    findings = _js(tmp_path, "require('child_process').exec(cmd);\n")
+    assert any(f.rule_id == "MCP102" for f in findings)
+
+
+def test_execsync_is_flagged(tmp_path):
+    findings = _js(tmp_path, "execSync(userInput);\n")
+    assert any(f.rule_id == "MCP102" for f in findings)
+
+
+def test_global_eval_is_still_flagged(tmp_path):
+    findings = _js(tmp_path, "eval(userInput);\n")
+    assert any(f.rule_id == "MCP101" for f in findings)
+
+
+def test_method_named_eval_is_not_global_eval(tmp_path):
+    findings = _js(tmp_path, "const r = interpreter.eval(expr);\n")
+    assert findings == []

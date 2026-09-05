@@ -6,7 +6,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](pyproject.toml)
 
-**Audit an MCP server before you let an agent near it.**
+**An MCP security scanner. Audit an MCP server before you let an agent near it.**
+
+`mcp-audit` is a command-line security scanner for MCP (Model Context Protocol)
+servers. It scans a server for prompt injection in tool descriptions, hardcoded
+secrets, dangerous code execution paths, and unsafe defaults — locally, with no
+account and no network calls.
 
 ![mcp-audit demo](docs/demo.gif)
 
@@ -165,11 +170,42 @@ then run it with no network access at all. It doesn't need any.
 Reporting a vulnerability — in this tool, or one you found *with* it — see
 [SECURITY.md](SECURITY.md).
 
+## What the MCP ecosystem actually looks like
+
+`research/ecosystem_scan.py` surveys public MCP servers harvested from the
+curated awesome-lists. Across a seeded sample of **141 successfully scanned
+repositories** (from a pool of 3,701):
+
+| | |
+|---|---|
+| Repositories with at least one finding | **41%** |
+| Most widespread: dangerous code sinks (MCP101/102) | 34 and 30 repos |
+| Hardcoded secrets (MCP201) | 13 repos |
+| **Prompt injection (MCP001)** | **1 repo** |
+
+Read those numbers with the caveats they deserve, because they cost something
+to learn:
+
+- **They are unverified automated output**, not audited vulnerabilities. The
+  first pass of this survey reported 37% and 931 HIGH findings — then
+  inspection showed most were fake credentials in test fixtures, `eval` in
+  benchmark harnesses, and `pattern.exec(line)` (the JavaScript RegExp API,
+  which alone accounted for 77% of the code-execution hits). Those became
+  [precision fixes](tests/test_precision.py), not a blog post.
+- **MCP001 firing once in 141 repos is the honest headline.** Deliberate tool
+  poisoning is an adversarial attack, and public repositories are mostly
+  written by people acting in good faith. The rule exists for the server you
+  *didn't* expect to be hostile — not because the ecosystem is full of them.
+- No repository is named here. If this tool finds something real in someone
+  else's server, [disclose it to them privately](SECURITY.md).
+
+Reproduce it yourself: `python research/ecosystem_scan.py --sample-size 150`.
+
 ## Rules
 
 | ID | Check |
 |----|-------|
-| MCP001 | Prompt-injection phrasing in tool description |
+| MCP001 | Prompt injection / tool poisoning in tool description |
 | MCP002 | Hidden/invisible unicode characters in tool description |
 | MCP003 | Suspiciously long tool description (payload smuggling risk) |
 | MCP004 | Over-broad capability exposed by tool name/description |

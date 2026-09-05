@@ -19,16 +19,48 @@ from pathlib import Path
 
 from mcp_audit.models import Finding, Severity
 
+# A tool description is not documentation — the model reads it as instruction.
+# These patterns look for text addressed to the *model* rather than to a human.
+#
+# The first group is naive/literal injection. The second is the shape real
+# tool-poisoning takes, which surveying 143 public servers showed the naive
+# patterns alone almost never catch: pseudo-tags carrying a hidden payload,
+# side-channel notes addressed to the assistant, instructions to read a
+# sensitive path and smuggle it out through a parameter, and tool shadowing
+# ("use this instead of X").
+#
+# Every pattern here has to survive a precision test: it must not plausibly
+# appear in an honest description. "Before using this tool, configure your
+# credentials" is ordinary documentation, so no pattern matches on
+# "before using this tool" alone.
 PROMPT_INJECTION_PATTERNS = [
+    # --- naive / literal ---
     r"ignore (all|any|previous|prior) instructions",
     r"disregard (the|your|all) (system|previous) prompt",
     r"you must always",
     r"do not (tell|inform|mention to) the user",
     r"without (asking|confirming|telling) the user",
     r"this is (a )?system (prompt|message)",
-    r"<\s*system\s*>",
     r"act as (if|though) you (are|were)",
     r"override (your|the) (rules|instructions|guidelines)",
+
+    # --- pseudo-tags used to smuggle a payload past a skim-read ---
+    r"<\s*/?\s*(system|important|secret|hidden|internal|instructions?)\s*>",
+    r"\[\s*(system|important|internal)\s*\]",
+
+    # --- text addressed to the model rather than the reader ---
+    r"\bnote (to|for) (the )?(ai|assistant|llm|model|agent)\b",
+    r"^\s*(ai|assistant|system)\s*:",
+    r"\b(do not|don't|never) (mention|reveal|display|show|report|log) ",
+
+    # --- exfiltration: read something sensitive, return it through a param ---
+    r"(read|cat|open|load)\b[^.]{0,60}(\.ssh|id_rsa|\.env\b|credentials|password|secret)",
+    r"(\.ssh|id_rsa|\.env\b)[^.]{0,60}\b(pass|send|include|provide|return)\b",
+
+    # --- tool shadowing / hijacking the model's choice of tool ---
+    r"\b(instead of|rather than) (using|calling|invoking) ",
+    r"\balways (call|use|invoke) this tool\b",
+    r"\b(your|the) (real|actual|true) (task|instruction|goal|purpose) is\b",
 ]
 
 INVISIBLE_CHAR_PATTERN = re.compile(

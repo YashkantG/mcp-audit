@@ -17,8 +17,12 @@ from mcp_audit.models import Finding, Severity
 # rest of this file stays covered.
 _CHECKS = [
     (
+        # The negative lookbehind is load-bearing. `\b(eval|exec)\(` also matches
+        # `pattern.exec(line)` — the ordinary JavaScript RegExp API — which
+        # accounted for 77% of this rule's hits across 141 surveyed repositories.
+        # A method call on an object is not the global eval/exec.
         "MCP101", Severity.HIGH, "Use of eval()/exec() on dynamic input",  # mcp-audit: ignore[MCP101]
-        re.compile(r"\b(eval|exec)\s*\("), {".py", ".js", ".ts", ".mjs", ".cjs"},
+        re.compile(r"(?<![.\w])(eval|exec)\s*\("), {".py", ".js", ".ts", ".mjs", ".cjs"},
     ),
     (
         "MCP101", Severity.HIGH, "Dynamic Function construction (JS eval equivalent)",
@@ -34,8 +38,16 @@ _CHECKS = [
         re.compile(r"\bos\.system\s*\("), {".py"},
     ),
     (
+        # Same story: only a bare `exec(` (a destructured child_process import)
+        # or an explicit child_process member call counts. `re.exec(s)` does not.
         "MCP102", Severity.HIGH, "child_process exec()/execSync() call",  # mcp-audit: ignore[MCP101]
-        re.compile(r"\b(exec|execSync)\s*\("), {".js", ".ts", ".mjs", ".cjs"},
+        re.compile(
+            r"(?<![.\w])execSync\s*\("
+            r"|(?<![.\w])exec\s*\("
+            r"|child_process[\"'\)\]]*\s*\.\s*exec"
+            r"|\b(?:cp|childProcess|child)\s*\.\s*execSync?\s*\("
+        ),
+        {".js", ".ts", ".mjs", ".cjs"},
     ),
     (
         "MCP103", Severity.HIGH, "pickle.loads() on potentially untrusted data",  # mcp-audit: ignore[MCP103]
