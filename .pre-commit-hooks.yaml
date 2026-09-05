@@ -1,0 +1,8 @@
+- id: mcp-sentinel
+  name: mcp-sentinel
+  description: Security scanner for MCP (Model Context Protocol) servers
+  entry: mcp-sentinel scan
+  language: python
+  pass_filenames: false
+  always_run: true
+  args: ["."]

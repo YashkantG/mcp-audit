@@ -2,13 +2,23 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from mcp_sentinel.checks import code_checks, config_checks, manifest_checks, secrets_checks
+from mcp_sentinel.checks import code_checks, config_checks, custom_checks, manifest_checks, secrets_checks
+from mcp_sentinel.config import load_config
 from mcp_sentinel.discovery import find_source_files, iter_files
 from mcp_sentinel.models import Finding
+from mcp_sentinel.suppressions import filter_suppressed
 
 
-def scan(target: Path) -> list[Finding]:
+def scan(
+    target: Path,
+    extra_ignored_rules: set | None = None,
+    config_path: Path | None = None,
+) -> list[Finding]:
     target = target.resolve()
+    config = load_config(config_path or target)
+    if extra_ignored_rules:
+        config.ignored_rules |= extra_ignored_rules
+
     findings: list[Finding] = []
 
     if target.is_file():
@@ -30,5 +40,9 @@ def scan(target: Path) -> list[Finding]:
 
     for file in all_files:
         findings.extend(secrets_checks.scan_file_for_secrets(file))
+        findings.extend(custom_checks.scan_with_custom_rules(file, config.custom_rules))
+
+    findings = filter_suppressed(findings)
+    findings = config.apply(findings)
 
     return findings

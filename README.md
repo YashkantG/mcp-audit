@@ -27,6 +27,12 @@ things that quietly turn a "helpful tool" into an attack surface:
 - 🌐 **Unsafe defaults** — binding to `0.0.0.0`, `trust`/`skip_auth` flags left
   enabled.
 
+Built for real pipelines, not just a terminal: SARIF output for GitHub/GitLab
+code scanning, a drop-in GitHub Action, a pre-commit hook, project-level
+config with inline suppression and bring-your-own custom rules, and zero
+network calls — see [Use in CI](#use-in-ci) and
+[Runs entirely on your machine](#runs-entirely-on-your-machine) below.
+
 ## Install
 
 ```bash
@@ -67,13 +73,99 @@ mcp-sentinel scan ./my-mcp-server
 11 finding(s)  (HIGH: 8  MEDIUM: 3)
 ```
 
-Use `--format json` for machine-readable output (great for CI), and
-`--fail-on` to control what severity trips a non-zero exit code:
+Use `--format json` for machine-readable output, `--format sarif` for
+[SARIF](https://sarifweb.azurewebsites.net/) (native GitHub/GitLab code-scanning
+ingestion), and `--fail-on` to control what severity trips a non-zero exit
+code:
 
 ```bash
 mcp-sentinel scan ./my-mcp-server --format json
 mcp-sentinel scan ./my-mcp-server --fail-on medium   # fail CI on MEDIUM or higher
 ```
+
+## Use in CI
+
+**GitHub Action** — drop this into a workflow, no `pip install` boilerplate needed:
+
+```yaml
+- uses: YashkantG/mcp-sentinel@main
+  with:
+    path: ./my-mcp-server
+    fail-on: high
+```
+
+**SARIF → GitHub Code Scanning**, so findings show up natively in the repo's
+Security tab instead of only in build logs:
+
+```yaml
+- uses: YashkantG/mcp-sentinel@main
+  with:
+    path: ./my-mcp-server
+    format: sarif
+    upload-sarif: "true"
+```
+
+**pre-commit** — add to `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/YashkantG/mcp-sentinel
+    rev: v0.3.0
+    hooks:
+      - id: mcp-sentinel
+```
+
+**Plain CLI in any CI system** works the same way — `mcp-sentinel scan . --fail-on high`
+returns a non-zero exit code when it finds something at or above that severity.
+
+## Suppressing findings
+
+A pattern-based scanner will occasionally flag something you've already
+reviewed and accepted. Three ways to tell it to stand down, from narrowest to
+broadest:
+
+**Inline comment**, right on the offending line:
+
+```python
+subprocess.run(cmd, shell=True)  # mcp-sentinel: ignore[MCP102]
+subprocess.run(cmd, shell=True)  # mcp-sentinel: ignore            (suppresses every rule on this line)
+```
+
+**Project config** — a `.mcpsentinel.toml` at the scan root:
+
+```toml
+[ignore]
+rules = ["MCP004"]              # never flag this rule, repo-wide
+paths = ["tests/fixtures/**"]   # never scan these paths
+
+[severity]
+MCP003 = "LOW"                  # downgrade instead of ignoring outright
+
+[[custom_rules]]                # bring your own checks — no fork required
+id = "CUSTOM001"
+pattern = "InternalOnlyApi\\.execute"
+message = "Use of internal-only API from an MCP tool handler is banned"
+severity = "HIGH"
+```
+
+**CLI flag**, for one-off or CI-specific overrides:
+
+```bash
+mcp-sentinel scan . --ignore-rule MCP004 --ignore-rule MCP301
+```
+
+## Runs entirely on your machine
+
+`mcp-sentinel` makes zero network calls. It doesn't phone home, doesn't send
+your code anywhere, and has no telemetry — the only dependencies are `typer`,
+`rich`, and (on Python <3.11) `tomli`, none of which the scanner itself uses
+for anything network-related. Releases are published via
+[PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/) (OIDC,
+no long-lived tokens), which gives you verifiable build provenance back to
+the exact GitHub Actions run that produced each release. If your security
+team needs to approve a new tool before it touches a private repo, that's the
+whole trust story: read the source, or don't even give it network access —
+it doesn't need any.
 
 ## Scanning real servers
 
@@ -133,7 +225,9 @@ welcome.
 Issues and PRs welcome — especially new rules, language support (only
 Python/JS/TS source checks exist today), and real-world MCP servers to test
 against. See the `tests/fixtures/` directory for the pattern used to add a
-new check with a positive and negative fixture.
+new check with a positive and negative fixture. A few
+[good first issues](https://github.com/YashkantG/mcp-sentinel/labels/good%20first%20issue)
+are tagged if you want a concrete starting point.
 
 ## License
 

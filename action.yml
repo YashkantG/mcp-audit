@@ -1,0 +1,81 @@
+name: "mcp-sentinel"
+description: "Security scanner for MCP (Model Context Protocol) servers"
+author: "Yash Kant Gautam"
+branding:
+  icon: "shield"
+  color: "red"
+
+inputs:
+  path:
+    description: "Path to scan (a server directory, source file, or mcp.json manifest)."
+    required: false
+    default: "."
+  fail-on:
+    description: "Minimum severity that fails the step: high, medium, or low."
+    required: false
+    default: "high"
+  format:
+    description: "Output format: table, json, or sarif."
+    required: false
+    default: "table"
+  config:
+    description: "Path to a .mcpsentinel.toml (or its containing directory)."
+    required: false
+    default: ""
+  ignore-rule:
+    description: "Space-separated rule IDs to suppress, e.g. 'MCP004 MCP301'."
+    required: false
+    default: ""
+  version:
+    description: "Version of mcp-sentinel-cli to install (defaults to latest)."
+    required: false
+    default: ""
+  upload-sarif:
+    description: "If true (and format is sarif), upload results to GitHub Code Scanning."
+    required: false
+    default: "false"
+
+outputs:
+  sarif-file:
+    description: "Path to the generated SARIF file, when format is sarif."
+    value: ${{ steps.scan.outputs.sarif-file }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install mcp-sentinel-cli
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.version }}" ]; then
+          pip install "mcp-sentinel-cli==${{ inputs.version }}"
+        else
+          pip install mcp-sentinel-cli
+        fi
+
+    - name: Run mcp-sentinel
+      id: scan
+      shell: bash
+      run: |
+        ARGS=("${{ inputs.path }}" --format "${{ inputs.format }}" --fail-on "${{ inputs.fail-on }}")
+        if [ -n "${{ inputs.config }}" ]; then
+          ARGS+=(--config "${{ inputs.config }}")
+        fi
+        for rule in ${{ inputs.ignore-rule }}; do
+          ARGS+=(--ignore-rule "$rule")
+        done
+
+        if [ "${{ inputs.format }}" = "sarif" ]; then
+          mcp-sentinel scan "${ARGS[@]}" > mcp-sentinel-results.sarif
+          EXIT_CODE=$?
+          echo "sarif-file=mcp-sentinel-results.sarif" >> "$GITHUB_OUTPUT"
+        else
+          mcp-sentinel scan "${ARGS[@]}"
+          EXIT_CODE=$?
+        fi
+        exit $EXIT_CODE
+
+    - name: Upload SARIF to GitHub Code Scanning
+      if: always() && inputs.format == 'sarif' && inputs.upload-sarif == 'true'
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: mcp-sentinel-results.sarif
