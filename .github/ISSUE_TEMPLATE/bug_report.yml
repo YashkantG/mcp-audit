@@ -15,7 +15,7 @@ body:
       label: Minimal reproduction
       description: >
         The smallest file/snippet that triggers it, and the exact command you ran
-        (e.g. `mcp-sentinel scan ./repro --format json`). If it's a crash, include
+        (e.g. `mcp-audit scan ./repro --format json`). If it's a crash, include
         the full traceback.
       render: shell
     validations:
@@ -23,8 +23,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: mcp-sentinel version
-      description: Output of `mcp-sentinel --version`
+      label: mcp-audit version
+      description: Output of `mcp-audit --version`
     validations:
       required: true
   - type: input

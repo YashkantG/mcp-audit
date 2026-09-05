@@ -1,0 +1,16 @@
+# mcp-audit's configuration for scanning itself. Yes, it scans itself in CI.
+#
+# tests/ needs no entry here — test, fixture, and example directories are
+# skipped by default as of 0.4.0. The one exclusion left is the ecosystem
+# survey harness, which shells out to git and to the scanner itself; it's
+# tooling, not an MCP server.
+#
+# Note what is *not* excluded: src/. The scanner's own source stays covered,
+# with the handful of unavoidable self-references (rule messages that contain
+# the very constructs they describe) suppressed inline instead — see
+# checks/code_checks.py — so the rest of those files keep being checked.
+
+[ignore]
+paths = [
+    "*/research/*",
+]

@@ -4,7 +4,7 @@
       "command": "node",
       "args": ["server.js"],
       "env": {
-        "API_KEY": "not-a-real-token-but-hardcoded-anyway"
+        "API_KEY": "8f4b2c9d1e7a3f6b5c0d9e8a7b4f2c1d"
       }
     }
   },

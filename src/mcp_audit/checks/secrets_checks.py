@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from mcp_sentinel.models import Finding, Severity
+from mcp_audit.models import Finding, Severity
 
 _SECRET_PATTERNS = [
     ("AWS Access Key ID", re.compile(r"\bAKIA[0-9A-Z]{16}\b")),
@@ -19,7 +19,22 @@ _SECRET_PATTERNS = [
     ),
 ]
 
-_PLACEHOLDER_HINTS = ("example", "xxxx", "changeme", "your_", "<", "${", "process.env", "os.environ")
+# A line containing any of these is treated as a non-secret. Derived from a
+# survey of 143 public MCP server repositories, where the overwhelming majority
+# of MCP201 hits were fake credentials in tests, mock fixtures, and docs —
+# things like `api_key: "local-mock-only-key"` or a dummy `ghp_...` token in a
+# test asserting that redaction works.
+#
+# This deliberately trades recall for precision. A scanner that cries wolf on
+# every mock credential gets switched off, and a switched-off scanner has a
+# detection rate of zero.
+_PLACEHOLDER_HINTS = (
+    "example", "xxxx", "changeme", "your_", "your-", "<", "${",
+    "process.env", "os.environ", "getenv", "mock", "fake", "dummy",
+    "placeholder", "sample", "redacted", "not-a-real", "notreal",
+    "test-", "-test", "test_", "_test", "local-", "localhost",
+    "insert", "replace-me", "todo", "xxx",
+)
 
 SKIP_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".woff", ".woff2", ".ttf", ".lock"}
 

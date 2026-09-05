@@ -7,9 +7,9 @@ from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 
-from mcp_sentinel import __version__
-from mcp_sentinel.models import Finding, Severity
-from mcp_sentinel.rules import RULES
+from mcp_audit import __version__
+from mcp_audit.models import Finding, Severity
+from mcp_audit.rules import RULES
 
 _SARIF_LEVEL = {
     Severity.HIGH: "error",
@@ -31,7 +31,7 @@ def render_table(findings: list[Finding], console: Console | None = None) -> Non
         console.print("[bold green]No issues found.[/bold green]")
         return
 
-    table = Table(title="mcp-sentinel findings", show_lines=False)
+    table = Table(title="mcp-audit findings", show_lines=False)
     table.add_column("Severity")
     table.add_column("Rule")
     table.add_column("Location")
@@ -110,9 +110,9 @@ def render_sarif(findings: list[Finding], root: Path) -> str:
             {
                 "tool": {
                     "driver": {
-                        "name": "mcp-sentinel",
+                        "name": "mcp-audit",
                         "version": __version__,
-                        "informationUri": "https://github.com/YashkantG/mcp-sentinel",
+                        "informationUri": "https://github.com/YashkantG/mcp-audit",
                         "rules": rules,
                     }
                 },
@@ -188,5 +188,5 @@ def render_badge(findings: list[Finding]) -> str:
 def badge_markdown(raw_url: str = "<raw-url-to-your-committed-badge.json>") -> str:
     return (
         f"[![MCP security](https://img.shields.io/endpoint?url={raw_url})]"
-        "(https://github.com/YashkantG/mcp-sentinel)"
+        "(https://github.com/YashkantG/mcp-audit)"
     )

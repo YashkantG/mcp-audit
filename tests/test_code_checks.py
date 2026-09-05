@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from mcp_sentinel.checks.code_checks import scan_source_file
+from mcp_audit.checks.code_checks import scan_source_file
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

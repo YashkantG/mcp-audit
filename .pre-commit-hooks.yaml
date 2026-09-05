@@ -1,7 +1,7 @@
-- id: mcp-sentinel
-  name: mcp-sentinel
+- id: mcp-audit
+  name: mcp-audit
   description: Security scanner for MCP (Model Context Protocol) servers
-  entry: mcp-sentinel scan
+  entry: mcp-audit scan
   language: python
   pass_filenames: false
   always_run: true

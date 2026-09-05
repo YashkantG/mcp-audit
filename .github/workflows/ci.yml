@@ -20,18 +20,18 @@ jobs:
       - run: pytest -v
       - name: Smoke-test the CLI against its own fixtures
         run: |
-          mcp-sentinel scan tests/fixtures/vulnerable_server --format json || true
-          mcp-sentinel scan tests/fixtures/clean_server
+          mcp-audit scan tests/fixtures/vulnerable_server --format json || true
+          mcp-audit scan tests/fixtures/clean_server
 
-      - name: Dogfood — mcp-sentinel scans itself
-        # Uses the repo's own .mcpsentinel.toml. If this fails, either we
+      - name: Dogfood — mcp-audit scans itself
+        # Uses the repo's own .mcpaudit.toml. If this fails, either we
         # introduced a real problem or a rule got noisier; both are worth
         # blocking on.
-        run: mcp-sentinel scan .
+        run: mcp-audit scan .
 
       - name: Verify the committed self-scan badge is current
         if: matrix.python-version == '3.12'
         run: |
-          mcp-sentinel scan . --format badge > /tmp/badge.json
+          mcp-audit scan . --format badge > /tmp/badge.json
           diff /tmp/badge.json .github/badges/self-scan.json \
-            || (echo "::error::self-scan badge is stale — regenerate with: mcp-sentinel scan . --format badge > .github/badges/self-scan.json" && exit 1)
+            || (echo "::error::self-scan badge is stale — regenerate with: mcp-audit scan . --format badge > .github/badges/self-scan.json" && exit 1)

@@ -6,13 +6,13 @@ from typing import List, Optional
 import typer
 from rich.console import Console
 
-from mcp_sentinel import __version__
-from mcp_sentinel.models import Severity
-from mcp_sentinel.report import render_badge, render_json, render_sarif, render_table
-from mcp_sentinel.scanner import scan as run_scan
+from mcp_audit import __version__
+from mcp_audit.models import Severity
+from mcp_audit.report import render_badge, render_json, render_sarif, render_table
+from mcp_audit.scanner import scan as run_scan
 
 app = typer.Typer(
-    name="mcp-sentinel",
+    name="mcp-audit",
     help="Security scanner for MCP (Model Context Protocol) servers and tool manifests.",
     add_completion=False,
 )
@@ -21,7 +21,7 @@ console = Console()
 
 def _version_callback(value: bool) -> None:
     if value:
-        console.print(f"mcp-sentinel {__version__}")
+        console.print(f"mcp-audit {__version__}")
         raise typer.Exit()
 
 
@@ -49,11 +49,20 @@ def scan_command(
     ),
     config: Optional[Path] = typer.Option(
         None, "--config", exists=True,
-        help="Path to a .mcpsentinel.toml (or its containing directory). Defaults to looking next to TARGET.",
+        help="Path to a .mcpaudit.toml (or its containing directory). Defaults to looking next to TARGET.",
+    ),
+    include_tests: bool = typer.Option(
+        False, "--include-tests",
+        help="Also scan test/benchmark/example directories, which are skipped by default.",
     ),
 ) -> None:
     """Scan TARGET for MCP security issues."""
-    findings = run_scan(target, extra_ignored_rules=set(ignore_rule), config_path=config)
+    findings = run_scan(
+        target,
+        extra_ignored_rules=set(ignore_rule),
+        config_path=config,
+        include_tests=include_tests,
+    )
 
     if fmt == "json":
         print(render_json(findings))

@@ -17,7 +17,7 @@ import json
 import re
 from pathlib import Path
 
-from mcp_sentinel.models import Finding, Severity
+from mcp_audit.models import Finding, Severity
 
 PROMPT_INJECTION_PATTERNS = [
     r"ignore (all|any|previous|prior) instructions",

@@ -1,4 +1,4 @@
-name: "mcp-sentinel"
+name: "mcp-audit"
 description: "Security scanner for MCP (Model Context Protocol) servers"
 author: "Yash Kant Gautam"
 branding:
@@ -19,7 +19,7 @@ inputs:
     required: false
     default: "table"
   config:
-    description: "Path to a .mcpsentinel.toml (or its containing directory)."
+    description: "Path to a .mcpaudit.toml (or its containing directory)."
     required: false
     default: ""
   ignore-rule:
@@ -27,7 +27,7 @@ inputs:
     required: false
     default: ""
   version:
-    description: "Version of mcp-sentinel-cli to install (defaults to latest)."
+    description: "Version of mcp-audit to install (defaults to latest)."
     required: false
     default: ""
   upload-sarif:
@@ -43,16 +43,16 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Install mcp-sentinel-cli
+    - name: Install mcp-audit
       shell: bash
       run: |
         if [ -n "${{ inputs.version }}" ]; then
-          pip install "mcp-sentinel-cli==${{ inputs.version }}"
+          pip install "mcp-audit==${{ inputs.version }}"
         else
-          pip install mcp-sentinel-cli
+          pip install mcp-audit
         fi
 
-    - name: Run mcp-sentinel
+    - name: Run mcp-audit
       id: scan
       shell: bash
       run: |
@@ -65,11 +65,11 @@ runs:
         done
 
         if [ "${{ inputs.format }}" = "sarif" ]; then
-          mcp-sentinel scan "${ARGS[@]}" > mcp-sentinel-results.sarif
+          mcp-audit scan "${ARGS[@]}" > mcp-audit-results.sarif
           EXIT_CODE=$?
-          echo "sarif-file=mcp-sentinel-results.sarif" >> "$GITHUB_OUTPUT"
+          echo "sarif-file=mcp-audit-results.sarif" >> "$GITHUB_OUTPUT"
         else
-          mcp-sentinel scan "${ARGS[@]}"
+          mcp-audit scan "${ARGS[@]}"
           EXIT_CODE=$?
         fi
         exit $EXIT_CODE
@@ -78,4 +78,4 @@ runs:
       if: always() && inputs.format == 'sarif' && inputs.upload-sarif == 'true'
       uses: github/codeql-action/upload-sarif@v3
       with:
-        sarif_file: mcp-sentinel-results.sarif
+        sarif_file: mcp-audit-results.sarif

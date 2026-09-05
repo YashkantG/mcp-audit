@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Ecosystem survey output (regenerate with research/ecosystem_scan.py)
+research/results*.json

@@ -1,4 +1,4 @@
-"""Survey the public MCP server ecosystem with mcp-sentinel.
+"""Survey the public MCP server ecosystem with mcp-audit.
 
 Harvests MCP server repositories from public curated lists, shallow-clones a
 deterministic sample, runs the scanner over each, and aggregates the results.
@@ -73,7 +73,7 @@ def scan_repo(slug: str, workdir: Path) -> dict | None:
 
     try:
         proc = subprocess.run(
-            [sys.executable, "-m", "mcp_sentinel", "scan", str(dest), "--format", "json"],
+            [sys.executable, "-m", "mcp_audit", "scan", str(dest), "--format", "json"],
             capture_output=True, text=True, timeout=SCAN_TIMEOUT_S,
         )
         findings = json.loads(proc.stdout) if proc.stdout.strip() else []

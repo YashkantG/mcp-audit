@@ -1,14 +1,14 @@
-# mcp-sentinel
+# mcp-audit
 
-[![CI](https://github.com/YashkantG/mcp-sentinel/actions/workflows/ci.yml/badge.svg)](https://github.com/YashkantG/mcp-sentinel/actions/workflows/ci.yml)
-[![MCP security](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/YashkantG/mcp-sentinel/main/.github/badges/self-scan.json)](#show-your-posture)
-[![PyPI](https://img.shields.io/pypi/v/mcp-sentinel-cli)](https://pypi.org/project/mcp-sentinel-cli/)
+[![CI](https://github.com/YashkantG/mcp-audit/actions/workflows/ci.yml/badge.svg)](https://github.com/YashkantG/mcp-audit/actions/workflows/ci.yml)
+[![MCP security](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/YashkantG/mcp-audit/main/.github/badges/self-scan.json)](#show-your-posture)
+[![PyPI](https://img.shields.io/pypi/v/mcp-audit)](https://pypi.org/project/mcp-audit/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](pyproject.toml)
 
 **Audit an MCP server before you let an agent near it.**
 
-![mcp-sentinel demo](docs/demo.gif)
+![mcp-audit demo](docs/demo.gif)
 
 Connecting an agent to a Model Context Protocol server hands that server two
 things at once: **code execution on your machine**, and **a direct line to the
@@ -23,7 +23,7 @@ at the implementation. That's a new class of supply-chain risk, and there are
 now [20,000+ MCP servers](https://mcp.so) in public directories with almost no
 security review between them and your agent.
 
-`mcp-sentinel` is a fast, local, dependency-light first pass over any MCP
+`mcp-audit` is a fast, local, dependency-light first pass over any MCP
 server — one you didn't write, or one you're about to publish.
 
 ---
@@ -33,10 +33,10 @@ server — one you didn't write, or one you're about to publish.
 Audit a server you're thinking about trusting:
 
 ```bash
-pip install mcp-sentinel-cli
+pip install mcp-audit
 
 git clone https://github.com/some-org/some-mcp-server
-mcp-sentinel scan ./some-mcp-server
+mcp-audit scan ./some-mcp-server
 ```
 
 That's the whole workflow. No account, no config file, no network calls — see
@@ -67,7 +67,7 @@ in CI.
 **GitHub Action** — no `pip install` boilerplate:
 
 ```yaml
-- uses: YashkantG/mcp-sentinel@main
+- uses: YashkantG/mcp-audit@main
   with:
     path: ./my-mcp-server
     fail-on: high
@@ -77,7 +77,7 @@ in CI.
 of scrolling past in a build log:
 
 ```yaml
-- uses: YashkantG/mcp-sentinel@main
+- uses: YashkantG/mcp-audit@main
   with:
     path: ./my-mcp-server
     format: sarif
@@ -88,13 +88,13 @@ of scrolling past in a build log:
 
 ```yaml
 repos:
-  - repo: https://github.com/YashkantG/mcp-sentinel
+  - repo: https://github.com/YashkantG/mcp-audit
     rev: v0.3.0
     hooks:
-      - id: mcp-sentinel
+      - id: mcp-audit
 ```
 
-**Any other CI** — `mcp-sentinel scan . --fail-on high` exits non-zero when it
+**Any other CI** — `mcp-audit scan . --fail-on high` exits non-zero when it
 finds something at or above that severity. `--format json` for machine-readable
 output.
 
@@ -106,11 +106,11 @@ commit and display, so the people evaluating your server can see it was
 checked:
 
 ```bash
-mcp-sentinel scan . --format badge > .github/badges/mcp-security.json
+mcp-audit scan . --format badge > .github/badges/mcp-security.json
 ```
 
 ```markdown
-[![MCP security](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/OWNER/REPO/main/.github/badges/mcp-security.json)](https://github.com/YashkantG/mcp-sentinel)
+[![MCP security](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/OWNER/REPO/main/.github/badges/mcp-security.json)](https://github.com/YashkantG/mcp-audit)
 ```
 
 Grades are deliberately blunt: **A** clean, **B/C** medium findings, **D/F**
@@ -125,11 +125,11 @@ narrowest first:
 **Inline**, on the offending line:
 
 ```python
-subprocess.run(cmd, shell=True)  # mcp-sentinel: ignore[MCP102]
-subprocess.run(cmd, shell=True)  # mcp-sentinel: ignore        ← all rules, this line
+subprocess.run(cmd, shell=True)  # mcp-audit: ignore[MCP102]
+subprocess.run(cmd, shell=True)  # mcp-audit: ignore        ← all rules, this line
 ```
 
-**Project config** — `.mcpsentinel.toml` at the scan root:
+**Project config** — `.mcpaudit.toml` at the scan root:
 
 ```toml
 [ignore]
@@ -146,13 +146,13 @@ message = "Internal-only API called from an MCP tool handler"
 severity = "HIGH"
 ```
 
-**CLI**, for one-offs: `mcp-sentinel scan . --ignore-rule MCP004`
+**CLI**, for one-offs: `mcp-audit scan . --ignore-rule MCP004`
 
-This repo's own [`.mcpsentinel.toml`](.mcpsentinel.toml) is a worked example.
+This repo's own [`.mcpaudit.toml`](.mcpaudit.toml) is a worked example.
 
 ## Runs entirely on your machine
 
-`mcp-sentinel` makes **zero network calls**. It doesn't phone home, doesn't
+`mcp-audit` makes **zero network calls**. It doesn't phone home, doesn't
 upload your code, and has no telemetry. Runtime dependencies are `typer`,
 `rich`, and `tomli` (Python < 3.11 only).
 
@@ -204,9 +204,9 @@ Issues and PRs welcome, especially new rules, more language coverage (Python /
 JS / TS today), and real-world servers that break it. See
 [CONTRIBUTING.md](CONTRIBUTING.md) for setup and the fixture-pair pattern every
 rule follows, or pick up a
-[good first issue](https://github.com/YashkantG/mcp-sentinel/labels/good%20first%20issue).
+[good first issue](https://github.com/YashkantG/mcp-audit/labels/good%20first%20issue).
 
-False positives are treated as real bugs — [report them](https://github.com/YashkantG/mcp-sentinel/issues/new/choose).
+False positives are treated as real bugs — [report them](https://github.com/YashkantG/mcp-audit/issues/new/choose).
 
 ## License
 

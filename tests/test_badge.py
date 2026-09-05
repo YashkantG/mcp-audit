@@ -1,9 +1,9 @@
 import json
 from pathlib import Path
 
-from mcp_sentinel.models import Finding, Severity
-from mcp_sentinel.report import grade, render_badge
-from mcp_sentinel.scanner import scan
+from mcp_audit.models import Finding, Severity
+from mcp_audit.report import grade, render_badge
+from mcp_audit.scanner import scan
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -46,14 +46,14 @@ def test_badge_is_valid_shields_endpoint_schema():
 
 
 def test_badge_reports_counts_for_dirty_target():
-    findings = scan(FIXTURES / "vulnerable_server")
+    findings = scan(FIXTURES / "vulnerable_server", include_tests=True)
     badge = json.loads(render_badge(findings))
     assert badge["color"] in {"red", "orange"}
     assert "high" in badge["message"]
 
 
 def test_badge_message_stays_short_enough_to_render():
-    findings = scan(FIXTURES / "vulnerable_server")
+    findings = scan(FIXTURES / "vulnerable_server", include_tests=True)
     badge = json.loads(render_badge(findings))
     # shields.io renders long messages, but a badge nobody can read is useless.
     assert len(badge["message"]) <= 40

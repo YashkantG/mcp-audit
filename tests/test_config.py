@@ -1,4 +1,4 @@
-from mcp_sentinel.scanner import scan
+from mcp_audit.scanner import scan
 
 
 def _write(path, content):
@@ -8,7 +8,7 @@ def _write(path, content):
 
 def test_ignored_rules_are_dropped(tmp_path):
     _write(tmp_path / "server.py", "import subprocess\nsubprocess.run('x', shell=True)\n")
-    _write(tmp_path / ".mcpsentinel.toml", '[ignore]\nrules = ["MCP102"]\n')
+    _write(tmp_path / ".mcpaudit.toml", '[ignore]\nrules = ["MCP102"]\n')
     findings = scan(tmp_path)
     assert findings == []
 
@@ -17,14 +17,14 @@ def test_ignored_paths_are_dropped(tmp_path):
     vendor = tmp_path / "vendor"
     vendor.mkdir()
     _write(vendor / "server.py", "import subprocess\nsubprocess.run('x', shell=True)\n")
-    _write(tmp_path / ".mcpsentinel.toml", '[ignore]\npaths = ["*/vendor/*"]\n')
+    _write(tmp_path / ".mcpaudit.toml", '[ignore]\npaths = ["*/vendor/*"]\n')
     findings = scan(tmp_path)
     assert findings == []
 
 
 def test_severity_override(tmp_path):
     _write(tmp_path / "server.py", "import subprocess\nsubprocess.run('x', shell=True)\n")
-    _write(tmp_path / ".mcpsentinel.toml", '[severity]\nMCP102 = "LOW"\n')
+    _write(tmp_path / ".mcpaudit.toml", '[severity]\nMCP102 = "LOW"\n')
     findings = scan(tmp_path)
     assert len(findings) == 1
     assert findings[0].severity.value == "LOW"
@@ -33,7 +33,7 @@ def test_severity_override(tmp_path):
 def test_custom_rule_fires(tmp_path):
     _write(tmp_path / "server.py", "InternalOnlyApi.execute('x')\n")
     _write(
-        tmp_path / ".mcpsentinel.toml",
+        tmp_path / ".mcpaudit.toml",
         '[[custom_rules]]\n'
         'id = "CUSTOM001"\n'
         'pattern = "InternalOnlyApi\\\\.execute"\n'
@@ -59,7 +59,7 @@ def test_extra_ignored_rules_param_combines_with_config(tmp_path):
         "subprocess.run('x', shell=True)\n"
         "os.system('y')\n",
     )
-    _write(tmp_path / ".mcpsentinel.toml", '[ignore]\nrules = ["MCP102"]\n')
+    _write(tmp_path / ".mcpaudit.toml", '[ignore]\nrules = ["MCP102"]\n')
     findings = scan(tmp_path, extra_ignored_rules={"MCP102"})
     rule_ids = {f.rule_id for f in findings}
     assert "MCP102" not in rule_ids

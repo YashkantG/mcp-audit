@@ -1,4 +1,4 @@
-"""Project-level configuration: .mcpsentinel.toml.
+"""Project-level configuration: .mcpaudit.toml.
 
 Lets a team check in what "accepted risk" looks like for their repo instead
 of relying purely on CLI flags or editing the source they're scanning.
@@ -17,14 +17,14 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from mcp_sentinel.models import Severity
+from mcp_audit.models import Severity
 
 if sys.version_info >= (3, 11):
     import tomllib
 else:
     import tomli as tomllib
 
-CONFIG_FILENAME = ".mcpsentinel.toml"
+CONFIG_FILENAME = ".mcpaudit.toml"
 
 
 @dataclass
@@ -67,7 +67,7 @@ def _with_severity(finding, severity_name: str):
 
 
 def load_config(root: Path) -> Config:
-    """Load .mcpsentinel.toml from `root` (or its containing directory, if
+    """Load .mcpaudit.toml from `root` (or its containing directory, if
     `root` is a file). Returns an empty Config if no file is present.
     """
     search_dir = root if root.is_dir() else root.parent

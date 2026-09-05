@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mcp-sentinel-cli"
+name = "mcp-audit"
 version = "0.3.0"
 description = "Security scanner for MCP (Model Context Protocol) servers"
 readme = "README.md"
@@ -24,15 +24,15 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/YashkantG/mcp-sentinel"
-Repository = "https://github.com/YashkantG/mcp-sentinel"
-Issues = "https://github.com/YashkantG/mcp-sentinel/issues"
+Homepage = "https://github.com/YashkantG/mcp-audit"
+Repository = "https://github.com/YashkantG/mcp-audit"
+Issues = "https://github.com/YashkantG/mcp-audit/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
 
 [project.scripts]
-mcp-sentinel = "mcp_sentinel.cli:app"
+mcp-audit = "mcp_audit.cli:app"
 
 [tool.setuptools.packages.find]
 where = ["src"]
