@@ -29,17 +29,24 @@ from mcp_triage.models import Finding, Severity
 # sensitive path and smuggle it out through a parameter, and tool shadowing
 # ("use this instead of X").
 #
-# Every pattern here has to survive a precision test: it must not plausibly
-# appear in an honest description. "Before using this tool, configure your
-# credentials" is ordinary documentation, so no pattern matches on
-# "before using this tool" alone.
+# Every pattern here has to survive a precision test against REAL descriptions,
+# not imagined ones. An earlier version of this list was written from
+# imagination and, run against 139 public servers, produced 32 hits of which
+# essentially all were false positives:
+#
+#   "show the user the exact text and who it goes to, get a yes, then send"
+#   "resolve a video WITHOUT asking the user for an id"
+#   "Use this instead of calling the REST API directly"
+#
+# The lesson is that concealment language is not itself suspicious. "Never log
+# the access token" and "do not show raw JSON" are *good* advice. What is
+# suspicious is concealing THE TOOL'S OWN ACTION FROM THE USER, so the patterns
+# below require that object rather than matching any negation of "show".
 PROMPT_INJECTION_PATTERNS = [
     # --- naive / literal ---
     r"ignore (all|any|previous|prior) instructions",
     r"disregard (the|your|all) (system|previous) prompt",
     r"you must always",
-    r"do not (tell|inform|mention to) the user",
-    r"without (asking|confirming|telling) the user",
     r"this is (a )?system (prompt|message)",
     r"act as (if|though) you (are|were)",
     r"override (your|the) (rules|instructions|guidelines)",
@@ -51,15 +58,28 @@ PROMPT_INJECTION_PATTERNS = [
     # --- text addressed to the model rather than the reader ---
     r"\bnote (to|for) (the )?(ai|assistant|llm|model|agent)\b",
     r"^\s*(ai|assistant|system)\s*:",
-    r"\b(do not|don't|never) (mention|reveal|display|show|report|log) ",
+
+    # --- concealing the call itself from the user ---
+    # Requires both the concealment verb AND the thing concealed being this
+    # tool/call/operation. Bare "do not show X" is deliberately not matched.
+    r"\b(do not|don't|never)\s+(mention|reveal|disclose|tell|inform|report)\b"
+    r"[^.]{0,60}\b(this (tool|call|invocation|operation|step)"
+    r"|that you (called|used|invoked|ran)"
+    r"|the (tool|function) call)\b",
+
+    # Acting consequentially behind the user's back — the verb matters. Plain
+    # "without asking the user for an id" is ordinary and must not match.
+    r"\b(delete|remove|send|email|post|transfer|upload|exfiltrat\w+|execute|run)\b"
+    r"[^.]{0,50}\bwithout (asking|confirming with|notifying|telling) the user\b",
 
     # --- exfiltration: read something sensitive, return it through a param ---
     r"(read|cat|open|load)\b[^.]{0,60}(\.ssh|id_rsa|\.env\b|credentials|password|secret)",
     r"(\.ssh|id_rsa|\.env\b)[^.]{0,60}\b(pass|send|include|provide|return)\b",
 
     # --- tool shadowing / hijacking the model's choice of tool ---
-    r"\b(instead of|rather than) (using|calling|invoking) ",
-    r"\balways (call|use|invoke) this tool\b",
+    # "always call this tool first/before anything" is the hijack; a bare
+    # "always use this tool for X" is an author's honest routing hint.
+    r"\balways (call|use|invoke) this tool (first|before)\b",
     r"\b(your|the) (real|actual|true) (task|instruction|goal|purpose) is\b",
 ]
 
@@ -224,9 +244,13 @@ def scan_manifest_file(path: Path) -> list[Finding]:
 # list built as a JS/TS/Python object literal rather than a JSON file).
 # ---------------------------------------------------------------------------
 
-_DESCRIPTION_KEY_RE = re.compile(r"""\bdescription\s*[:=]\s*""")
+# The optional closing quote matters: Python dicts and JSON-style JS objects
+# write `"description":`, not `description:`. Without it this extractor was
+# blind to every tool defined in a dict literal — which silently understated
+# how often the description rules fired in the v0.4.0 ecosystem survey.
+_DESCRIPTION_KEY_RE = re.compile(r"""\bdescription["']?\s*[:=]\s*""")
 _NAME_NEARBY_RE = re.compile(
-    r"""\bname\s*[:=]\s*["'`]([^"'`]{1,80})["'`]"""
+    r"""\bname["']?\s*[:=]\s*["'`]([^"'`]{1,80})["'`]"""
     r"""|\b(?:registerTool|register_tool|addTool|add_tool)\s*\(\s*["'`]([^"'`]{1,80})["'`]"""
 )
 _NAME_SEARCH_WINDOW = 300

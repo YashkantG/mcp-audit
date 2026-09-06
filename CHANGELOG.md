@@ -27,6 +27,35 @@ detail:
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-09-06
+
+### Fixed
+- **MCP001 was firing almost entirely on false positives in 0.4.0.** Running the
+  survey against the pinned release produced 32 hits across 4 servers, and
+  inspection showed essentially all were benign — including descriptions being
+  *more* careful than average about consent:
+
+  > "show the user the exact text and who it goes to, get a yes, then send"
+  > "resolve a video without asking the user for an id"
+  > "Use this instead of calling the REST API directly"
+
+  The patterns treated any concealment language as hostile, but "never log the
+  access token" and "do not show raw JSON" are good advice. They now require the
+  concealed thing to be *the tool's own call*, and require a consequential verb
+  before "without asking the user". The negative test cases are now taken
+  verbatim from real servers rather than written from imagination — which is why
+  the originals missed this.
+
+- **Tool descriptions written as `"description":` were never scanned.** The
+  extractor matched only the bare `description:` form, so every tool defined in
+  a Python dict or a JSON-style JS object literal was invisible to MCP001–MCP004.
+  Found by an end-to-end check on an obviously-poisoned description that
+  returned nothing.
+
+  This also means the 0.4.0 survey understated description-rule coverage, and
+  any figure quoted from it should be treated as a floor.
+
+
 ## [0.4.0] - 2026-09-06
 
 ### Renamed
@@ -117,7 +146,8 @@ now fixed and covered by regression tests:
   sinks, hardcoded secrets, and unsafe server defaults.
 - `table` and `json` output, `--fail-on` severity gating for CI.
 
-[Unreleased]: https://github.com/YashkantG/mcp-triage/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/YashkantG/mcp-triage/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/YashkantG/mcp-triage/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/YashkantG/mcp-triage/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/YashkantG/mcp-triage/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/YashkantG/mcp-triage/compare/v0.1.0...v0.2.0

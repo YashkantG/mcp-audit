@@ -173,31 +173,39 @@ Reporting a vulnerability — in this tool, or one you found *with* it — see
 ## What the MCP ecosystem actually looks like
 
 `research/ecosystem_scan.py` surveys public MCP servers harvested from the
-curated awesome-lists. Across a seeded sample of **141 successfully scanned
-repositories** (from a pool of 3,701):
+curated awesome-lists. Against a pinned release, over a seeded sample of
+**139 successfully scanned repositories** (pool of 3,701):
 
 | | |
 |---|---|
-| Repositories with at least one finding | **41%** |
-| Most widespread: dangerous code sinks (MCP101/102) | 34 and 30 repos |
+| Repositories with at least one finding | **35%** |
+| Long tool descriptions (MCP003) | 25 repos |
+| Shell/exec sinks (MCP102 / MCP101) | 17 and 12 repos |
+| Over-broad capability (MCP004) | 14 repos |
 | Hardcoded secrets (MCP201) | 13 repos |
-| **Prompt injection (MCP001)** | **1 repo** |
 
-Read those numbers with the caveats they deserve, because they cost something
-to learn:
+**Treat these as provisional, and as a floor.** The survey's real value so far
+has been finding bugs in this scanner, not in other people's servers. In order:
 
-- **They are unverified automated output**, not audited vulnerabilities. The
-  first pass of this survey reported 37% and 931 HIGH findings — then
-  inspection showed most were fake credentials in test fixtures, `eval` in
-  benchmark harnesses, and `pattern.exec(line)` (the JavaScript RegExp API,
-  which alone accounted for 77% of the code-execution hits). Those became
-  [precision fixes](tests/test_precision.py), not a blog post.
-- **MCP001 firing once in 141 repos is the honest headline.** Deliberate tool
-  poisoning is an adversarial attack, and public repositories are mostly
-  written by people acting in good faith. The rule exists for the server you
-  *didn't* expect to be hostile — not because the ecosystem is full of them.
-- No repository is named here. If this tool finds something real in someone
-  else's server, [disclose it to them privately](SECURITY.md).
+- The first pass reported 37% and 931 HIGH findings. Inspection showed most
+  were fake credentials in test fixtures, `eval` in benchmark harnesses, and
+  `pattern.exec(line)` — the JavaScript RegExp API — which alone was **77%** of
+  all code-execution hits.
+- The harness itself recorded crashed scans as "0 findings", quietly turning
+  scanner failures into clean bills of health.
+- Re-running against the pinned v0.4.0 produced 32 prompt-injection hits which,
+  on inspection, were **essentially all false positives** — including
+  descriptions being *more* careful than average about user consent. Fixed in
+  v0.4.1.
+- That same check revealed the extractor never matched `"description":` (the
+  quoted-key form used by Python dicts), so tools defined in dict literals were
+  never scanned at all. Description-rule coverage in the numbers above is
+  therefore **understated**.
+
+Each of those became a [precision regression test](tests/test_precision.py)
+rather than a headline. No repository is named here; if this tool finds
+something real in someone else's server,
+[disclose it to them privately](SECURITY.md).
 
 Reproduce it yourself: `python research/ecosystem_scan.py --sample-size 150`.
 
