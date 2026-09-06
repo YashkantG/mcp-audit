@@ -17,14 +17,60 @@ detail:
 - **A rule's default severity will not change in a patch release.** Severity
   changes ship in a minor release at the earliest, and are always listed here.
 - **New rules may be added in a minor release.** This can surface new findings
-  in an existing codebase, which is why `--fail-on`, `.mcptriage.toml`, and
-  (from 0.4.0) baselines exist.
+  in an existing codebase, which is why `--fail-on`, `--ignore-rule` and
+  `.mcptriage.toml` exist. (A baseline mode, to accept existing findings and
+  fail only on new ones, is planned but not yet implemented.)
 - **Removing a rule, or making an existing rule meaningfully broader, is a
   breaking change** and waits for a major version.
 
 ---
 
 ## [Unreleased]
+
+## [0.4.0] - 2026-09-06
+
+### Renamed
+- **The project is now `mcp-triage`** (was `mcp-sentinel`, briefly `mcp-audit`).
+  "Sentinel" collided with Microsoft Sentinel, which had just shipped its own
+  MCP server; "audit" was rejected by PyPI as too similar to the existing
+  `mcpaudit`. Rule IDs are unchanged and remain the stable public API.
+- Config file is `.mcptriage.toml`; suppression comments are
+  `# mcp-triage: ignore[MCP102]`.
+
+### Added
+- **`--format badge`** — emits a shields.io endpoint payload a project can
+  commit and display, showing an A–F posture grade.
+- **`--include-tests`** — opts test/example/benchmark directories back into a
+  scan (they are skipped by default, see below).
+- **GitHub Pages site** at https://yashkantg.github.io/mcp-triage/.
+- **`research/ecosystem_scan.py`** — reproducible survey harness for the public
+  MCP server ecosystem, plus the results it produced in the README.
+
+### Changed — detection accuracy
+Surveying 141 public MCP servers exposed three classes of false positive, all
+now fixed and covered by regression tests:
+
+- **Test, fixture, example, benchmark and mock directories are skipped by
+  default.** Most raw findings came from fake credentials in redaction tests
+  and deliberately-unsafe example snippets. `vendor/` and `third_party/` are
+  never scanned.
+- **The secrets check recognises mock/placeholder values** (`local-mock-key`,
+  `dummy-token`, ...). Cut MCP201 findings by 85% across the survey.
+- **`MCP101`/`MCP102` no longer match `pattern.exec(line)`** — the ordinary
+  JavaScript RegExp API, which accounted for **77%** of all code-execution
+  findings. Now requires a bare call or an explicit `child_process` member.
+- **A JSON object needs more than a `description` field to count as a tool.**
+  npm manifests and OpenAPI documents were being scanned as tool definitions.
+
+### Changed — MCP001
+- **Prompt-injection detection now covers real tool poisoning**, not just
+  literal "ignore previous instructions": pseudo-tag payloads
+  (`<IMPORTANT>`, `<instructions>`), notes addressed to the assistant,
+  read-a-sensitive-path-and-return-it-via-parameter, and tool shadowing. Half
+  the new tests are negative cases — ordinary documentation must stay clean.
+
+  Worth stating plainly: across 141 surveyed repositories, MCP001 fired **once**
+  under the old patterns. Deliberate tool poisoning is rare in public code.
 
 ## [0.3.0] - 2026-09-05
 
@@ -71,7 +117,8 @@ detail:
   sinks, hardcoded secrets, and unsafe server defaults.
 - `table` and `json` output, `--fail-on` severity gating for CI.
 
-[Unreleased]: https://github.com/YashkantG/mcp-triage/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/YashkantG/mcp-triage/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/YashkantG/mcp-triage/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/YashkantG/mcp-triage/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/YashkantG/mcp-triage/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/YashkantG/mcp-triage/releases/tag/v0.1.0
