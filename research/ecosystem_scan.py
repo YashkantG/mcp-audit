@@ -1,4 +1,4 @@
-"""Survey the public MCP server ecosystem with mcp-audit.
+"""Survey the public MCP server ecosystem with mcp-triage.
 
 Harvests MCP server repositories from public curated lists, shallow-clones a
 deterministic sample, runs the scanner over each, and aggregates the results.
@@ -73,7 +73,7 @@ def scan_repo(slug: str, workdir: Path) -> dict | None:
 
     try:
         proc = subprocess.run(
-            [sys.executable, "-m", "mcp_audit", "scan", str(dest), "--format", "json"],
+            [sys.executable, "-m", "mcp_triage", "scan", str(dest), "--format", "json"],
             capture_output=True, text=True, timeout=SCAN_TIMEOUT_S,
         )
         # Exit 0 = clean, exit 1 = findings at/above --fail-on. Anything else is

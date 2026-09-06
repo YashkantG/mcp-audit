@@ -1,4 +1,4 @@
-name: "mcp-audit"
+name: "mcp-triage"
 description: "Security scanner for MCP (Model Context Protocol) servers"
 author: "Yash Kant Gautam"
 branding:
@@ -19,7 +19,7 @@ inputs:
     required: false
     default: "table"
   config:
-    description: "Path to a .mcpaudit.toml (or its containing directory)."
+    description: "Path to a .mcptriage.toml (or its containing directory)."
     required: false
     default: ""
   ignore-rule:
@@ -27,7 +27,7 @@ inputs:
     required: false
     default: ""
   version:
-    description: "Version of mcp-audit to install (defaults to latest)."
+    description: "Version of mcp-triage to install (defaults to latest)."
     required: false
     default: ""
   upload-sarif:
@@ -43,16 +43,16 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Install mcp-audit
+    - name: Install mcp-triage
       shell: bash
       run: |
         if [ -n "${{ inputs.version }}" ]; then
-          pip install "mcp-audit==${{ inputs.version }}"
+          pip install "mcp-triage==${{ inputs.version }}"
         else
-          pip install mcp-audit
+          pip install mcp-triage
         fi
 
-    - name: Run mcp-audit
+    - name: Run mcp-triage
       id: scan
       shell: bash
       run: |
@@ -65,11 +65,11 @@ runs:
         done
 
         if [ "${{ inputs.format }}" = "sarif" ]; then
-          mcp-audit scan "${ARGS[@]}" > mcp-audit-results.sarif
+          mcp-triage scan "${ARGS[@]}" > mcp-triage-results.sarif
           EXIT_CODE=$?
-          echo "sarif-file=mcp-audit-results.sarif" >> "$GITHUB_OUTPUT"
+          echo "sarif-file=mcp-triage-results.sarif" >> "$GITHUB_OUTPUT"
         else
-          mcp-audit scan "${ARGS[@]}"
+          mcp-triage scan "${ARGS[@]}"
           EXIT_CODE=$?
         fi
         exit $EXIT_CODE
@@ -78,4 +78,4 @@ runs:
       if: always() && inputs.format == 'sarif' && inputs.upload-sarif == 'true'
       uses: github/codeql-action/upload-sarif@v3
       with:
-        sarif_file: mcp-audit-results.sarif
+        sarif_file: mcp-triage-results.sarif

@@ -1,4 +1,4 @@
-# mcp-audit's configuration for scanning itself. Yes, it scans itself in CI.
+# mcp-triage's configuration for scanning itself. Yes, it scans itself in CI.
 #
 # tests/ needs no entry here — test, fixture, and example directories are
 # skipped by default as of 0.4.0. The one exclusion left is the ecosystem

@@ -4,26 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>mcp-audit — MCP security scanner for Model Context Protocol servers</title>
+<title>mcp-triage — MCP security scanner for Model Context Protocol servers</title>
 <meta name="description" content="Open-source MCP security scanner. Audit an MCP server for prompt injection in tool descriptions, hardcoded secrets, dangerous code execution and unsafe defaults. Runs locally, no account, no network calls. SARIF output and a GitHub Action for CI.">
-<link rel="canonical" href="https://yashkantg.github.io/mcp-audit/">
+<link rel="canonical" href="https://yashkantg.github.io/mcp-triage/">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="mcp-audit — MCP security scanner">
+<meta property="og:title" content="mcp-triage — MCP security scanner">
 <meta property="og:description" content="Audit an MCP server before you let an agent near it. Prompt-injection detection, secret scanning, SARIF output. Runs entirely on your machine.">
-<meta property="og:url" content="https://yashkantg.github.io/mcp-audit/">
+<meta property="og:url" content="https://yashkantg.github.io/mcp-triage/">
 <meta name="twitter:card" content="summary_large_image">
 
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "name": "mcp-audit",
+  "name": "mcp-triage",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Windows, macOS, Linux",
   "description": "A command-line security scanner for MCP (Model Context Protocol) servers. Detects prompt injection in tool descriptions, hardcoded secrets, dangerous code execution paths and unsafe defaults.",
-  "url": "https://github.com/YashkantG/mcp-audit",
-  "downloadUrl": "https://pypi.org/project/mcp-audit/",
+  "url": "https://github.com/YashkantG/mcp-triage",
+  "downloadUrl": "https://pypi.org/project/mcp-triage/",
   "license": "https://opensource.org/licenses/MIT",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
 }
@@ -71,30 +71,30 @@
 <body>
 <div class="wrap">
 
-  <h1>mcp-audit</h1>
+  <h1>mcp-triage</h1>
   <p class="tagline">An MCP security scanner. Audit an MCP server before you let an agent near it.</p>
 
   <div class="badges">
-    <a href="https://github.com/YashkantG/mcp-audit/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/YashkantG/mcp-audit/actions/workflows/ci.yml/badge.svg"></a>
-    <img alt="MCP security grade" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/YashkantG/mcp-audit/main/.github/badges/self-scan.json">
-    <a href="https://pypi.org/project/mcp-audit/"><img alt="PyPI" src="https://img.shields.io/pypi/v/mcp-audit"></a>
+    <a href="https://github.com/YashkantG/mcp-triage/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/YashkantG/mcp-triage/actions/workflows/ci.yml/badge.svg"></a>
+    <img alt="MCP security grade" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/YashkantG/mcp-triage/main/.github/badges/self-scan.json">
+    <a href="https://pypi.org/project/mcp-triage/"><img alt="PyPI" src="https://img.shields.io/pypi/v/mcp-triage"></a>
     <img alt="MIT licence" src="https://img.shields.io/badge/License-MIT-yellow.svg">
   </div>
 
   <p>
-    <a class="cta" href="https://github.com/YashkantG/mcp-audit">View on GitHub</a>
-    <a class="cta secondary" href="https://pypi.org/project/mcp-audit/">Install from PyPI</a>
+    <a class="cta" href="https://github.com/YashkantG/mcp-triage">View on GitHub</a>
+    <a class="cta secondary" href="https://pypi.org/project/mcp-triage/">Install from PyPI</a>
   </p>
 
   <p>
-    <code>mcp-audit</code> is a command-line security scanner for
+    <code>mcp-triage</code> is a command-line security scanner for
     <strong>MCP (Model Context Protocol) servers</strong>. It scans a server for
     prompt injection in tool descriptions, hardcoded secrets, dangerous code
     execution paths, and unsafe defaults — locally, with no account and
     <strong>no network calls</strong>.
   </p>
 
-  <img src="demo.gif" alt="mcp-audit scanning an MCP server and printing a table of security findings">
+  <img src="demo.gif" alt="mcp-triage scanning an MCP server and printing a table of security findings">
 
   <h2>Why MCP servers need their own scanner</h2>
   <p>
@@ -112,10 +112,10 @@
   </p>
 
   <h2>Install and scan</h2>
-<pre><code>pip install mcp-audit
+<pre><code>pip install mcp-triage
 
 git clone https://github.com/some-org/some-mcp-server
-mcp-audit scan ./some-mcp-server</code></pre>
+mcp-triage scan ./some-mcp-server</code></pre>
 
   <h2>What it detects</h2>
   <table>
@@ -132,17 +132,17 @@ mcp-audit scan ./some-mcp-server</code></pre>
     <tr><td>MCP301</td><td>Server bound to all network interfaces</td></tr>
     <tr><td>MCP302</td><td>Authentication or trust check disabled</td></tr>
   </table>
-  <p class="muted">Plus any custom rules you define in <code>.mcpaudit.toml</code>.</p>
+  <p class="muted">Plus any custom rules you define in <code>.mcptriage.toml</code>.</p>
 
   <h2>Use it in CI</h2>
   <h3>GitHub Action</h3>
-<pre><code>- uses: YashkantG/mcp-audit@main
+<pre><code>- uses: YashkantG/mcp-triage@main
   with:
     path: ./my-mcp-server
     fail-on: high</code></pre>
 
   <h3>SARIF into GitHub Code Scanning</h3>
-<pre><code>- uses: YashkantG/mcp-audit@main
+<pre><code>- uses: YashkantG/mcp-triage@main
   with:
     path: ./my-mcp-server
     format: sarif
@@ -150,14 +150,14 @@ mcp-audit scan ./some-mcp-server</code></pre>
 
   <h3>pre-commit</h3>
 <pre><code>repos:
-  - repo: https://github.com/YashkantG/mcp-audit
+  - repo: https://github.com/YashkantG/mcp-triage
     rev: v0.3.0
     hooks:
-      - id: mcp-audit</code></pre>
+      - id: mcp-triage</code></pre>
 
   <h2>Runs entirely on your machine</h2>
   <p>
-    <code>mcp-audit</code> makes zero network calls. It does not phone home, does
+    <code>mcp-triage</code> makes zero network calls. It does not phone home, does
     not upload your code, and has no telemetry. Runtime dependencies are
     <code>typer</code>, <code>rich</code>, and <code>tomli</code> on Python&nbsp;&lt;&nbsp;3.11.
     Releases publish through
@@ -174,16 +174,16 @@ mcp-audit scan ./some-mcp-server</code></pre>
     Issues and pull requests welcome — especially new rules, more language
     coverage, and real servers that break it. False positives are treated as
     real bugs. See
-    <a href="https://github.com/YashkantG/mcp-audit/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+    <a href="https://github.com/YashkantG/mcp-triage/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
     or pick up a
-    <a href="https://github.com/YashkantG/mcp-audit/labels/good%20first%20issue">good first issue</a>.
+    <a href="https://github.com/YashkantG/mcp-triage/labels/good%20first%20issue">good first issue</a>.
   </p>
 
   <footer>
     MIT licensed ·
-    <a href="https://github.com/YashkantG/mcp-audit">GitHub</a> ·
-    <a href="https://pypi.org/project/mcp-audit/">PyPI</a> ·
-    <a href="https://github.com/YashkantG/mcp-audit/blob/main/SECURITY.md">Security policy</a>
+    <a href="https://github.com/YashkantG/mcp-triage">GitHub</a> ·
+    <a href="https://pypi.org/project/mcp-triage/">PyPI</a> ·
+    <a href="https://github.com/YashkantG/mcp-triage/blob/main/SECURITY.md">Security policy</a>
   </footer>
 
 </div>

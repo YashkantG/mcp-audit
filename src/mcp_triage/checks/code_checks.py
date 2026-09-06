@@ -7,12 +7,12 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from mcp_audit.models import Finding, Severity
+from mcp_triage.models import Finding, Severity
 
 # (rule_id, severity, message, compiled pattern, file suffixes it applies to)
 #
 # The human-readable messages below necessarily contain the very constructs
-# they describe, so several of them trip their own rules when mcp-audit is
+# they describe, so several of them trip their own rules when mcp-triage is
 # pointed at itself. Suppressed inline rather than excluded wholesale, so the
 # rest of this file stays covered.
 _CHECKS = [
@@ -21,7 +21,7 @@ _CHECKS = [
         # `pattern.exec(line)` — the ordinary JavaScript RegExp API — which
         # accounted for 77% of this rule's hits across 141 surveyed repositories.
         # A method call on an object is not the global eval/exec.
-        "MCP101", Severity.HIGH, "Use of eval()/exec() on dynamic input",  # mcp-audit: ignore[MCP101]
+        "MCP101", Severity.HIGH, "Use of eval()/exec() on dynamic input",  # mcp-triage: ignore[MCP101]
         re.compile(r"(?<![.\w])(eval|exec)\s*\("), {".py", ".js", ".ts", ".mjs", ".cjs"},
     ),
     (
@@ -34,13 +34,13 @@ _CHECKS = [
         {".py"},
     ),
     (
-        "MCP102", Severity.HIGH, "os.system() call",  # mcp-audit: ignore[MCP102]
+        "MCP102", Severity.HIGH, "os.system() call",  # mcp-triage: ignore[MCP102]
         re.compile(r"\bos\.system\s*\("), {".py"},
     ),
     (
         # Same story: only a bare `exec(` (a destructured child_process import)
         # or an explicit child_process member call counts. `re.exec(s)` does not.
-        "MCP102", Severity.HIGH, "child_process exec()/execSync() call",  # mcp-audit: ignore[MCP101]
+        "MCP102", Severity.HIGH, "child_process exec()/execSync() call",  # mcp-triage: ignore[MCP101]
         re.compile(
             r"(?<![.\w])execSync\s*\("
             r"|(?<![.\w])exec\s*\("
@@ -50,11 +50,11 @@ _CHECKS = [
         {".js", ".ts", ".mjs", ".cjs"},
     ),
     (
-        "MCP103", Severity.HIGH, "pickle.loads() on potentially untrusted data",  # mcp-audit: ignore[MCP103]
+        "MCP103", Severity.HIGH, "pickle.loads() on potentially untrusted data",  # mcp-triage: ignore[MCP103]
         re.compile(r"\bpickle\.loads?\s*\("), {".py"},
     ),
     (
-        "MCP103", Severity.MEDIUM, "yaml.load() without a safe loader",  # mcp-audit: ignore[MCP103]
+        "MCP103", Severity.MEDIUM, "yaml.load() without a safe loader",  # mcp-triage: ignore[MCP103]
         re.compile(r"\byaml\.load\s*\((?!.*Loader\s*=\s*yaml\.SafeLoader)"), {".py"},
     ),
 ]

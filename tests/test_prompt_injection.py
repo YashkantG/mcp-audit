@@ -5,7 +5,7 @@ tool-poisoning takes; the negative cases are ordinary, honest descriptions that
 must not trip the rule. A prompt-injection check with a bad false-positive rate
 is worse than none, because people stop believing it.
 """
-from mcp_audit.checks.manifest_checks import check_description
+from mcp_triage.checks.manifest_checks import check_description
 
 
 def fires(description: str) -> bool:

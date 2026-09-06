@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from mcp_audit.checks.secrets_checks import scan_file_for_secrets
+from mcp_triage.checks.secrets_checks import scan_file_for_secrets
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from mcp_audit.checks.config_checks import scan_config_file
+from mcp_triage.checks.config_checks import scan_config_file
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

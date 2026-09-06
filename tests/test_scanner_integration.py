@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from mcp_audit.models import Severity
-from mcp_audit.scanner import scan
+from mcp_triage.models import Severity
+from mcp_triage.scanner import scan
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

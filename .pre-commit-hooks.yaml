@@ -1,7 +1,7 @@
-- id: mcp-audit
-  name: mcp-audit
+- id: mcp-triage
+  name: mcp-triage
   description: Security scanner for MCP (Model Context Protocol) servers
-  entry: mcp-audit scan
+  entry: mcp-triage scan
   language: python
   pass_filenames: false
   always_run: true

@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from mcp_audit.models import Finding, Severity
+from mcp_triage.models import Finding, Severity
 
 _SECRET_PATTERNS = [
     ("AWS Access Key ID", re.compile(r"\bAKIA[0-9A-Z]{16}\b")),

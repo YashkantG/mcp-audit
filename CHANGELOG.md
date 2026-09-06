@@ -17,7 +17,7 @@ detail:
 - **A rule's default severity will not change in a patch release.** Severity
   changes ship in a minor release at the earliest, and are always listed here.
 - **New rules may be added in a minor release.** This can surface new findings
-  in an existing codebase, which is why `--fail-on`, `.mcpaudit.toml`, and
+  in an existing codebase, which is why `--fail-on`, `.mcptriage.toml`, and
   (from 0.4.0) baselines exist.
 - **Removing a rule, or making an existing rule meaningfully broader, is a
   breaking change** and waits for a major version.
@@ -34,9 +34,9 @@ detail:
   SARIF-consuming dashboard.
 - **Badge output** (`--format badge`) producing a shields.io endpoint payload,
   so a scanned project can display its own posture grade.
-- **Inline suppression comments**: `# mcp-audit: ignore[MCP102]` suppresses
-  a specific rule on that line; a bare `# mcp-audit: ignore` suppresses all.
-- **Project configuration** via `.mcpaudit.toml`: repo-wide rule and path
+- **Inline suppression comments**: `# mcp-triage: ignore[MCP102]` suppresses
+  a specific rule on that line; a bare `# mcp-triage: ignore` suppresses all.
+- **Project configuration** via `.mcptriage.toml`: repo-wide rule and path
   ignores, per-rule severity overrides, and `[[custom_rules]]` for
   organisation-specific checks without forking.
 - `--ignore-rule` (repeatable) and `--config` CLI options.
@@ -71,7 +71,7 @@ detail:
   sinks, hardcoded secrets, and unsafe server defaults.
 - `table` and `json` output, `--fail-on` severity gating for CI.
 
-[Unreleased]: https://github.com/YashkantG/mcp-audit/compare/v0.3.0...HEAD
-[0.3.0]: https://github.com/YashkantG/mcp-audit/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/YashkantG/mcp-audit/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/YashkantG/mcp-audit/releases/tag/v0.1.0
+[Unreleased]: https://github.com/YashkantG/mcp-triage/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/YashkantG/mcp-triage/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/YashkantG/mcp-triage/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/YashkantG/mcp-triage/releases/tag/v0.1.0

@@ -17,7 +17,7 @@ import json
 import re
 from pathlib import Path
 
-from mcp_audit.models import Finding, Severity
+from mcp_triage.models import Finding, Severity
 
 # A tool description is not documentation — the model reads it as instruction.
 # These patterns look for text addressed to the *model* rather than to a human.

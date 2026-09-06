@@ -3,7 +3,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
-from mcp_audit.cli import app
+from mcp_triage.cli import app
 
 FIXTURES = Path(__file__).parent / "fixtures"
 runner = CliRunner()
@@ -39,4 +39,4 @@ def test_sarif_format_produces_valid_json():
 def test_version_flag():
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert "mcp-audit" in result.stdout
+    assert "mcp-triage" in result.stdout

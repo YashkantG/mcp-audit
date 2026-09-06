@@ -1,4 +1,4 @@
-"""Runs user-defined custom rules (from .mcpaudit.toml `[[custom_rules]]`)
+"""Runs user-defined custom rules (from .mcptriage.toml `[[custom_rules]]`)
 against source files. This is the escape hatch for internal, company-specific
 checks — a banned internal API, a legacy secret prefix, a deprecated helper —
 without anyone needing to fork the tool.
@@ -8,8 +8,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from mcp_audit.config import CustomRule
-from mcp_audit.models import Finding, Severity
+from mcp_triage.config import CustomRule
+from mcp_triage.models import Finding, Severity
 
 
 def scan_with_custom_rules(path: Path, custom_rules: list) -> list:

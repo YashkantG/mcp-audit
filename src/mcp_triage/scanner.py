@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from mcp_audit.checks import code_checks, config_checks, custom_checks, manifest_checks, secrets_checks
-from mcp_audit.config import load_config
-from mcp_audit.discovery import find_source_files, iter_files
-from mcp_audit.models import Finding
-from mcp_audit.suppressions import filter_suppressed
+from mcp_triage.checks import code_checks, config_checks, custom_checks, manifest_checks, secrets_checks
+from mcp_triage.config import load_config
+from mcp_triage.discovery import find_source_files, iter_files
+from mcp_triage.models import Finding
+from mcp_triage.suppressions import filter_suppressed
 
 
 def scan(

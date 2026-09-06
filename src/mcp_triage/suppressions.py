@@ -1,10 +1,10 @@
 """Inline suppression comments, e.g.:
 
-    subprocess.run(cmd, shell=True)  # mcp-audit: ignore[MCP102]
-    subprocess.run(cmd, shell=True)  # mcp-audit: ignore
+    subprocess.run(cmd, shell=True)  # mcp-triage: ignore[MCP102]
+    subprocess.run(cmd, shell=True)  # mcp-triage: ignore
 
 The bracketed form suppresses only the listed rule IDs on that line; the
-bare form suppresses everything mcp-audit would otherwise flag there.
+bare form suppresses everything mcp-triage would otherwise flag there.
 Findings with no line number (most JSON-manifest and config findings)
 aren't eligible — there's no line to attach a comment to.
 """
@@ -14,7 +14,7 @@ import re
 from functools import lru_cache
 from pathlib import Path
 
-_SUPPRESS_RE = re.compile(r"mcp-audit:\s*ignore(?:\[([A-Za-z0-9,\s]+)\])?", re.IGNORECASE)
+_SUPPRESS_RE = re.compile(r"mcp-triage:\s*ignore(?:\[([A-Za-z0-9,\s]+)\])?", re.IGNORECASE)
 
 
 @lru_cache(maxsize=256)

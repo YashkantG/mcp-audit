@@ -1,9 +1,9 @@
 import json
 from pathlib import Path
 
-from mcp_audit.models import Finding, Severity
-from mcp_audit.report import grade, render_badge
-from mcp_audit.scanner import scan
+from mcp_triage.models import Finding, Severity
+from mcp_triage.report import grade, render_badge
+from mcp_triage.scanner import scan
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

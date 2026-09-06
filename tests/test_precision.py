@@ -7,8 +7,8 @@ code. Each case below is a real pattern observed in that survey.
 """
 import json
 
-from mcp_audit.checks.manifest_checks import scan_manifest_file
-from mcp_audit.scanner import scan
+from mcp_triage.checks.manifest_checks import scan_manifest_file
+from mcp_triage.scanner import scan
 
 DANGEROUS = "import subprocess\nsubprocess.run('x', shell=True)\n"
 LONG = "x " * 300  # over the MCP003 description-length threshold

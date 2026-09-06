@@ -1,8 +1,8 @@
 import json
 from pathlib import Path
 
-from mcp_audit.report import render_sarif
-from mcp_audit.scanner import scan
+from mcp_triage.report import render_sarif
+from mcp_triage.scanner import scan
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -14,7 +14,7 @@ def test_sarif_output_is_valid_json_with_expected_shape():
 
     assert sarif["version"] == "2.1.0"
     run = sarif["runs"][0]
-    assert run["tool"]["driver"]["name"] == "mcp-audit"
+    assert run["tool"]["driver"]["name"] == "mcp-triage"
 
     result_rule_ids = {r["ruleId"] for r in run["results"]}
     driver_rule_ids = {r["id"] for r in run["tool"]["driver"]["rules"]}

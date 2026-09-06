@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from mcp_audit.models import Finding, Severity
+from mcp_triage.models import Finding, Severity
 
 _BIND_ALL_VALUES = {"0.0.0.0", "::"}
 

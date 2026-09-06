@@ -1,4 +1,4 @@
-from mcp_audit.scanner import scan
+from mcp_triage.scanner import scan
 
 
 def test_bracketed_suppression_only_suppresses_listed_rule(tmp_path):
@@ -6,7 +6,7 @@ def test_bracketed_suppression_only_suppresses_listed_rule(tmp_path):
     server.write_text(
         "import subprocess\n"
         "def run(cmd):\n"
-        "    subprocess.run(cmd, shell=True)  # mcp-audit: ignore[MCP102]\n"
+        "    subprocess.run(cmd, shell=True)  # mcp-triage: ignore[MCP102]\n"
     )
     findings = scan(tmp_path)
     assert findings == []
@@ -17,7 +17,7 @@ def test_bare_suppression_suppresses_everything_on_the_line(tmp_path):
     server.write_text(
         "import os\n"
         "def run(cmd):\n"
-        "    os.system(cmd)  # mcp-audit: ignore\n"
+        "    os.system(cmd)  # mcp-triage: ignore\n"
     )
     findings = scan(tmp_path)
     assert findings == []
@@ -39,7 +39,7 @@ def test_suppression_does_not_affect_other_lines(tmp_path):
     server.write_text(
         "import subprocess, os\n"
         "def run1(cmd):\n"
-        "    subprocess.run(cmd, shell=True)  # mcp-audit: ignore[MCP102]\n"
+        "    subprocess.run(cmd, shell=True)  # mcp-triage: ignore[MCP102]\n"
         "def run2(cmd):\n"
         "    os.system(cmd)\n"
     )

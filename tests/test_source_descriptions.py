@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from mcp_audit.checks.manifest_checks import scan_source_descriptions
+from mcp_triage.checks.manifest_checks import scan_source_descriptions
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

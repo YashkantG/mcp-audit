@@ -1,9 +1,9 @@
 # Security Policy
 
-## Reporting a vulnerability in mcp-audit itself
+## Reporting a vulnerability in mcp-triage itself
 
 Please report security issues in the scanner privately, via
-[GitHub's private vulnerability reporting](https://github.com/YashkantG/mcp-audit/security/advisories/new)
+[GitHub's private vulnerability reporting](https://github.com/YashkantG/mcp-triage/security/advisories/new)
 rather than a public issue.
 
 Expect an initial response within 7 days. If a fix is warranted, it ships in a
@@ -12,7 +12,7 @@ window to upgrade.
 
 ### What counts as a vulnerability here
 
-`mcp-audit` is a local static analyser with a deliberately small attack
+`mcp-triage` is a local static analyser with a deliberately small attack
 surface — it reads files and writes a report. Things that would qualify:
 
 - **Code execution while scanning.** The scanner must never execute, import,
@@ -30,11 +30,11 @@ surface — it reads files and writes a report. Things that would qualify:
 - **A missed detection (false negative).** The tool is explicitly a
   pattern-based first pass, not a complete analyser — it makes no soundness
   guarantee. Missed detections are ordinary bugs; please
-  [open an issue](https://github.com/YashkantG/mcp-audit/issues/new/choose)
+  [open an issue](https://github.com/YashkantG/mcp-triage/issues/new/choose)
   so a rule can be added.
 - **A false positive.** Also an ordinary bug, also welcome as an issue.
 
-## Reporting a vulnerability you found *with* mcp-audit
+## Reporting a vulnerability you found *with* mcp-triage
 
 If this tool helped you find a real issue in **someone else's** MCP server,
 please disclose it to that project privately first. Do not open a public

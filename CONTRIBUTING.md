@@ -1,16 +1,16 @@
-# Contributing to mcp-audit
+# Contributing to mcp-triage
 
 Thanks for considering it. This project is intentionally small and
 regex/pattern-based rather than a full static-analysis engine, so most
 contributions are self-contained and don't require deep familiarity with the
-codebase — see [good first issues](https://github.com/YashkantG/mcp-audit/labels/good%20first%20issue)
+codebase — see [good first issues](https://github.com/YashkantG/mcp-triage/labels/good%20first%20issue)
 for a concrete starting point.
 
 ## Setup
 
 ```bash
-git clone https://github.com/YashkantG/mcp-audit.git
-cd mcp-audit
+git clone https://github.com/YashkantG/mcp-triage.git
+cd mcp-triage
 python -m venv .venv
 source .venv/bin/activate   # .venv\Scripts\activate on Windows
 pip install -e ".[dev]"
@@ -23,11 +23,11 @@ run the tests.
 ## Project layout
 
 ```
-src/mcp_audit/
+src/mcp_triage/
   cli.py                  # Typer CLI: argument parsing, output format selection
   scanner.py               # orchestrates discovery + checks + config/suppression filtering
-  config.py                 # .mcpaudit.toml loading (ignore rules/paths, severity, custom_rules)
-  suppressions.py           # inline "# mcp-audit: ignore[...]" comment handling
+  config.py                 # .mcptriage.toml loading (ignore rules/paths, severity, custom_rules)
+  suppressions.py           # inline "# mcp-triage: ignore[...]" comment handling
   report.py                 # table / json / sarif rendering
   rules.py                  # rule ID -> human-readable title registry
   checks/
@@ -35,7 +35,7 @@ src/mcp_audit/
     code_checks.py          # dangerous-sink checks (eval, shell=True, pickle.loads, ...)
     secrets_checks.py        # hardcoded credential regexes
     config_checks.py         # unsafe server defaults (bind-all, disabled auth)
-    custom_checks.py         # runs user-defined [[custom_rules]] from .mcpaudit.toml
+    custom_checks.py         # runs user-defined [[custom_rules]] from .mcptriage.toml
 tests/
   fixtures/
     vulnerable_server/       # intentionally insecure — should trigger findings
@@ -80,8 +80,8 @@ Useful sanity check before opening a PR — scan the project's own fixtures and
 confirm nothing regressed:
 
 ```bash
-mcp-audit scan tests/fixtures/vulnerable_server --format json
-mcp-audit scan tests/fixtures/clean_server   # should print "No issues found."
+mcp-triage scan tests/fixtures/vulnerable_server --format json
+mcp-triage scan tests/fixtures/clean_server   # should print "No issues found."
 ```
 
 ## Pull requests
